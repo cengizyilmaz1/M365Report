@@ -660,7 +660,7 @@ function calculateSecurityScore(
     details.push({ category: "MFA Coverage", score: 0, maxScore: 40, description: "MFA data not available." });
   }
 
-  let inactiveScore = 25;
+  let inactiveScore: number;
   if (signInAvailable && totalEnabled > 0) {
     const inactiveRatio = inactiveUsers / totalEnabled;
     inactiveScore = Math.round((1 - inactiveRatio) * 25);
@@ -671,8 +671,8 @@ function calculateSecurityScore(
       description: `${inactiveUsers} of ${totalEnabled} enabled accounts are inactive (${INACTIVE_THRESHOLD_DAYS}+ days).`
     });
   } else {
-    details.push({ category: "Inactive Users", score: 0, maxScore: 25, description: "Sign-in data not available." });
     inactiveScore = 0;
+    details.push({ category: "Inactive Users", score: 0, maxScore: 25, description: "Sign-in data not available." });
   }
 
   let guestScore = 20;
