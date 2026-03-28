@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { collectTenantReportSnapshot } from "./report-service";
+import { BROWSER_ONLY_REPORTS_NOTE, collectTenantReportSnapshot } from "./report-service";
 
 describe("collectTenantReportSnapshot", () => {
   afterEach(() => {
@@ -124,11 +124,57 @@ describe("collectTenantReportSnapshot", () => {
     expect(snapshot.overview.availableLicenses).toBe(6);
     expect(snapshot.users[0]?.assignedSkuNames).toContain("Office 365 E3");
     expect(snapshot.activity.every((dataset) => dataset.status === "unavailable")).toBe(true);
+    expect(snapshot.activity.every((dataset) => dataset.note?.includes("Reports.Read.All"))).toBe(true);
     expect(snapshot.sharePoint.summary.status).toBe("unavailable");
+    expect(snapshot.sharePoint.summary.note).toContain("Reports.Read.All");
     expect(snapshot.oneDrive.summary.status).toBe("unavailable");
+    expect(snapshot.oneDrive.summary.note).toContain("Reports.Read.All");
     expect(snapshot.security).toBeDefined();
     expect(snapshot.notes.some((note) => note.includes("service principal members"))).toBe(true);
     expect(snapshot.notes.some((note) => note.includes("mailboxSettings.userPurpose"))).toBe(true);
+  });
+
+  it("marks usage reports as unavailable in browser-only mode even when report scopes are granted", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+
+      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,assignedLicenses&$top=999")) {
+        return jsonResponse({ value: [] });
+      }
+
+      if (url.includes("/subscribedSkus")) {
+        return jsonResponse({ value: [] });
+      }
+
+      if (url.includes("/groups?$select=id,displayName,mailEnabled,securityEnabled,groupTypes&$top=999")) {
+        return jsonResponse({ value: [] });
+      }
+
+      if (url.includes("/reports/")) {
+        throw new Error("Reports endpoints should be skipped in browser-only mode.");
+      }
+
+      if (url.includes("/directoryRoles")) {
+        return jsonResponse({ value: [] });
+      }
+
+      throw new Error(`Unexpected request: ${url}`);
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    const snapshot = await collectTenantReportSnapshot(
+      async () => "token",
+      {
+        core: { requested: true, granted: true },
+        reports: { requested: true, granted: true },
+        advancedAudit: { requested: true, granted: false }
+      }
+    );
+
+    expect(snapshot.activity.every((dataset) => dataset.note === BROWSER_ONLY_REPORTS_NOTE)).toBe(true);
+    expect(snapshot.sharePoint.summary.note).toBe(BROWSER_ONLY_REPORTS_NOTE);
+    expect(snapshot.oneDrive.summary.note).toBe(BROWSER_ONLY_REPORTS_NOTE);
   });
 });
 

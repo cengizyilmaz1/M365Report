@@ -34,6 +34,8 @@ import type {
 import { mapWithConcurrency } from "@/lib/utils/concurrency";
 
 const INACTIVE_THRESHOLD_DAYS = 30;
+export const BROWSER_ONLY_REPORTS_NOTE =
+  "Microsoft Graph usage reports are delivered as short-lived redirected CSV downloads. In this browser-only deployment, those workload details cannot be read reliably. Use a server-side collector or private deployment for activity, SharePoint, and OneDrive usage reports.";
 
 const activityWorkloads: Array<{
   workload: ActivityWorkload;
@@ -354,6 +356,16 @@ async function buildActivityDatasets(
     }));
   }
 
+  if (isBrowserOnlyRuntime()) {
+    return activityWorkloads.map((dataset) => ({
+      workload: dataset.workload,
+      title: dataset.title,
+      rows: [],
+      status: "unavailable",
+      note: BROWSER_ONLY_REPORTS_NOTE
+    }));
+  }
+
   const datasets = await Promise.all(
     activityWorkloads.map(async (dataset) => {
       try {
@@ -391,6 +403,19 @@ async function collectSharePointData(
   };
 
   if (!permissionProfile.reports.granted) return empty;
+  if (isBrowserOnlyRuntime()) {
+    return {
+      summary: {
+        totalSites: 0,
+        activeSites: 0,
+        inactiveSites: 0,
+        totalStorageUsedBytes: 0,
+        status: "unavailable",
+        note: BROWSER_ONLY_REPORTS_NOTE
+      },
+      sites: []
+    };
+  }
 
   try {
     const csvText = await graph.getText("/reports/getSharePointSiteUsageDetail(period='D30')", "reports");
@@ -448,6 +473,19 @@ async function collectOneDriveData(
   };
 
   if (!permissionProfile.reports.granted) return empty;
+  if (isBrowserOnlyRuntime()) {
+    return {
+      summary: {
+        totalAccounts: 0,
+        activeAccounts: 0,
+        inactiveAccounts: 0,
+        totalStorageUsedBytes: 0,
+        status: "unavailable",
+        note: BROWSER_ONLY_REPORTS_NOTE
+      },
+      accounts: []
+    };
+  }
 
   try {
     const csvText = await graph.getText("/reports/getOneDriveUsageAccountDetail(period='D30')", "reports");
@@ -835,4 +873,8 @@ function safeInt(value: string | undefined): number {
   if (!value) return 0;
   const parsed = Number.parseInt(value, 10);
   return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+function isBrowserOnlyRuntime() {
+  return typeof window !== "undefined";
 }

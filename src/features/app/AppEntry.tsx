@@ -9,7 +9,7 @@ import { MetricCard } from "@/components/app/MetricCard";
 import { exportDataset } from "@/features/exports/exporters";
 import type { DatasetKey, ExportFormat } from "@/features/exports/exporters";
 import { useAuthSession } from "@/features/auth/useAuthSession";
-import { collectTenantReportSnapshot } from "@/features/reporting/report-service";
+import { BROWSER_ONLY_REPORTS_NOTE, collectTenantReportSnapshot } from "@/features/reporting/report-service";
 import { withBase } from "@/lib/paths";
 import type {
   ActivityDataset,
@@ -489,6 +489,19 @@ function LicensesPanel({ snapshot, onExport }: { snapshot: TenantReportSnapshot;
 }
 
 function ActivityPanel({ snapshot, onExport }: { snapshot: TenantReportSnapshot; onExport: PanelExport }) {
+  const browserOnlyReportsBlocked = snapshot.activity.every(
+    (dataset) => dataset.status === "unavailable" && dataset.note === BROWSER_ONLY_REPORTS_NOTE
+  );
+
+  if (browserOnlyReportsBlocked) {
+    return (
+      <UnavailablePanel
+        title="Activity"
+        note="Microsoft Graph usage detail reports are returned as short-lived CSV download redirects. In this browser-only GitHub Pages deployment, those files cannot be read into the dashboard. Move workload reporting to a server-side collector if you need Office 365, Teams, mailbox, or OneDrive activity tables."
+      />
+    );
+  }
+
   return (
     <DatasetPanel title="Activity" dataset="activity" snapshot={snapshot} onExport={onExport}>
       <div className="grid gap-3 sm:grid-cols-2">
