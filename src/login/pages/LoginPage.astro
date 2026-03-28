@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { siteConfig } from "@/lib/site";
+import LoginTrigger from "@/login/components/LoginTrigger";
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -41,18 +42,7 @@ const structuredData = {
         </p>
 
         <div class="mt-8">
-          <a
-            href="/app"
-            class="btn-primary w-full justify-center py-3.5 text-[15px]"
-            id="login-redirect"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-              <polyline points="10 17 15 12 10 7" />
-              <line x1="15" y1="12" x2="3" y2="12" />
-            </svg>
-            Continue with Microsoft Entra
-          </a>
+          <LoginTrigger client:load />
         </div>
 
         <div class="divider my-6"></div>

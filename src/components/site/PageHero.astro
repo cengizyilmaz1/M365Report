@@ -30,13 +30,13 @@ const { eyebrow, title, body } = Astro.props;
         <p class="max-w-3xl text-lg leading-8 text-ink-600">{body}</p>
 
         <div class="flex flex-wrap items-center gap-3 pt-1">
-          <a href={withBase(siteConfig.appPath)} class="btn-primary">
+          <a href={withBase(siteConfig.loginPath)} class="btn-primary">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
               <polyline points="10 17 15 12 10 7" />
               <line x1="15" y1="12" x2="3" y2="12" />
             </svg>
-            Open app
+            Sign in
           </a>
           <a href={withBase(siteConfig.blogPath)} class="btn-secondary">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

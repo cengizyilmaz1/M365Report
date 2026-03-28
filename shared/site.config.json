@@ -49,9 +49,9 @@
   ],
   "headerActions": [
     {
-      "href": "/app",
-      "label": "Open app",
-      "description": "Open the reporting dashboard.",
+      "href": "/login",
+      "label": "Sign in",
+      "description": "Sign in with Microsoft Entra to start reporting.",
       "tone": "primary"
     }
   ],
@@ -118,8 +118,8 @@
       "title": "Product",
       "links": [
         {
-          "href": "/app",
-          "label": "App"
+          "href": "/login",
+          "label": "Sign in"
         },
         {
           "href": "/blog",

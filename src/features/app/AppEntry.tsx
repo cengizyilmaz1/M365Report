@@ -213,22 +213,13 @@ function ReportingWorkspace() {
   }
 
   if (auth.status === "unauthenticated") {
+    // Redirect to login page — that's the single entry point for auth
+    window.location.href = withBase("/login");
     return (
       <div className="page-frame flex min-h-[60vh] items-center justify-center">
-        <div className="glass-panel max-w-sm rounded-3xl p-10 text-center animate-fade-up">
-          <div className="mb-6 flex justify-center">
-            <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-sky-500 to-violet-500 shadow-lg shadow-sky-500/20">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" />
-              </svg>
-            </span>
-          </div>
-          <h2 className="text-2xl font-bold tracking-tight text-ink-950" style={{ fontFamily: "var(--font-display)" }}>Welcome back</h2>
-          <p className="mt-2 text-sm text-ink-600">Sign in to start collecting tenant reports.</p>
-          <button type="button" onClick={() => void auth.signIn()} className="btn-primary mt-6 w-full justify-center py-3">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" /></svg>
-            Continue with Microsoft Entra
-          </button>
+        <div className="flex flex-col items-center gap-3 animate-fade-up">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin text-sky-500"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+          <p className="text-sm text-ink-600">Redirecting to sign in...</p>
         </div>
       </div>
     );
