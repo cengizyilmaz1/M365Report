@@ -22,7 +22,7 @@ interface SiteConfigShape {
     loginPath: string;
     appPath: string;
     blogPath: string;
-    docsPath: string;
+
     aboutPath: string;
     privacyPath: string;
     authorName: string;

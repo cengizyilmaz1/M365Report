@@ -512,7 +512,7 @@ async function collectSecurityInsights(
   try {
     mfaDetails = await graph.getAllPages<GraphMfaRegistrationDetail>(
       "/reports/authenticationMethods/userRegistrationDetails?$top=999",
-      "reports"
+      "advancedAudit"
     );
     mfaAvailable = true;
   } catch {
@@ -635,7 +635,7 @@ async function collectSecurityInsights(
     users: securityUsers,
     adminRoles,
     status: mfaAvailable && signInCollection.available ? "available" : "partial",
-    note: !mfaAvailable ? "MFA registration data requires Reports.Read.All and Authentication Administrator role." : undefined
+    note: !mfaAvailable ? "MFA registration data requires AuditLog.Read.All and a supported Microsoft Entra role." : undefined
   };
 }
 

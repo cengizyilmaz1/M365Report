@@ -36,11 +36,6 @@ jobs:
           node-version: 22.13.1
           cache: npm
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.4
-
       - name: Resolve public site settings
         shell: bash
         run: |
@@ -62,19 +57,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Jekyll dependencies
-        working-directory: blog
-        run: bundle install
-
       - name: Materialize runtime config
         env:
           PUBLIC_APP_NAME: ${{ vars.PUBLIC_APP_NAME || 'M365 Tenant Reporter' }}
           PUBLIC_AUTHORITY: ${{ vars.PUBLIC_AUTHORITY || 'https://login.microsoftonline.com/organizations' }}
           PUBLIC_CLIENT_ID: ${{ vars.PUBLIC_CLIENT_ID }}
           PUBLIC_KNOWN_AUTHORITIES: ${{ vars.PUBLIC_KNOWN_AUTHORITIES }}
-          PUBLIC_LOGIN_REDIRECT_PATH: ${{ vars.PUBLIC_LOGIN_REDIRECT_PATH || '/login' }}
+          PUBLIC_LOGIN_REDIRECT_PATH: ${{ vars.PUBLIC_LOGIN_REDIRECT_PATH || '/app' }}
           PUBLIC_POST_LOGOUT_REDIRECT_PATH: ${{ vars.PUBLIC_POST_LOGOUT_REDIRECT_PATH || '/' }}
-          PUBLIC_CORE_SCOPES: ${{ vars.PUBLIC_CORE_SCOPES || 'openid,profile,email,User.Read,User.Read.All,GroupMember.Read.All,LicenseAssignment.Read.All,MailboxSettings.Read' }}
+          PUBLIC_CORE_SCOPES: ${{ vars.PUBLIC_CORE_SCOPES || 'openid,profile,email,User.Read,User.Read.All,GroupMember.Read.All,LicenseAssignment.Read.All,MailboxSettings.Read,RoleManagement.Read.All' }}
           PUBLIC_REPORTS_SCOPES: ${{ vars.PUBLIC_REPORTS_SCOPES || 'Reports.Read.All' }}
           PUBLIC_ADVANCED_AUDIT_SCOPES: ${{ vars.PUBLIC_ADVANCED_AUDIT_SCOPES || 'AuditLog.Read.All' }}
           PUBLIC_ALLOW_AUDIT_OPT_IN: ${{ vars.PUBLIC_ALLOW_AUDIT_OPT_IN || 'true' }}

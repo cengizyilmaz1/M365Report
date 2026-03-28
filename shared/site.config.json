@@ -7,7 +7,7 @@
     "loginPath": "/login",
     "appPath": "/app",
     "blogPath": "/blog",
-    "docsPath": "/docs/getting-started",
+
     "aboutPath": "/about",
     "privacyPath": "/privacy",
     "authorName": "Cengiz Yilmaz",
@@ -34,7 +34,7 @@
     {
       "href": "/blog",
       "label": "Blog",
-      "description": "Jekyll-powered guides and feature documentation."
+      "description": "Guides and feature documentation."
     },
     {
       "href": "/about",
@@ -125,10 +125,7 @@
           "href": "/blog",
           "label": "Blog"
         },
-        {
-          "href": "/docs/getting-started",
-          "label": "Docs"
-        },
+
         {
           "href": "/about",
           "label": "About"

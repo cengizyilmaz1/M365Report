@@ -1,10 +1,19 @@
 ---
+import { getCollection } from "astro:content";
 import GuideCard from "@/site/partials/GuideCard.astro";
-import { featuredGuides } from "@/lib/guides";
+import { sortBlogEntries, toBlogSummary } from "@/lib/blog";
+
+const entries = sortBlogEntries(await getCollection("blog"));
+const featuredGuides = entries
+  .filter((entry) => entry.data.featured)
+  .slice(0, 3)
+  .map((entry) => toBlogSummary(entry));
+
+const guides = (featuredGuides.length > 0 ? featuredGuides : entries.slice(0, 3).map((entry) => toBlogSummary(entry)));
 ---
 
 <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-  {featuredGuides.map((guide) => (
+  {guides.map((guide) => (
     <GuideCard guide={guide} />
   ))}
 </div>

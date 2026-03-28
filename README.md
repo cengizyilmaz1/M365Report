@@ -33,8 +33,8 @@ Production site:
 - `src/features/exports`: browser-only file generation
 - `src/components`: shared UI primitives for the public site and the app
 - `src/lib`: typed config, Graph helpers, shared models, and utilities
-- `blog`: standalone Jekyll application for the `/blog` section with its own layouts, includes, and posts
-- `shared`: cross-surface site config, guide metadata, and shared brand styling synchronized into Astro and Jekyll builds
+- `src/content/blog`: Astro content collection for the `/blog` section
+- `shared`: shared site config and brand styling used by the Astro application
 
 ## Centralized navigation and external network links
 
@@ -42,7 +42,7 @@ The primary site configuration is managed from:
 
 - `shared/site.config.json`
 
-Astro consumes that shared config through `src/lib/site.ts`, and the Jekyll blog receives the same data through the sync step in `scripts/sync-shared-assets.mjs`.
+Astro consumes that shared config through `src/lib/site.ts`.
 
 The shared config drives:
 
@@ -56,13 +56,12 @@ The product now includes an SEO-focused blog at:
 
 - `https://m365report.cengizyilmaz.net/blog`
 
-The blog is a dedicated Jekyll app with:
+The blog is implemented directly in Astro with:
 
-- `_layouts`
-- `_includes`
-- `_posts`
-- its own stylesheet layer
-- its own sitemap via `jekyll-sitemap`
+- content collections under `src/content/blog`
+- route files under `src/pages/blog`
+- shared site chrome through the main Astro layout
+- the same sitemap generation as the rest of the site
 
 Initial blog coverage includes:
 
@@ -114,6 +113,7 @@ Core:
 - `GroupMember.Read.All`
 - `LicenseAssignment.Read.All`
 - `MailboxSettings.Read`
+- `RoleManagement.Read.All`
 
 Reports:
 
@@ -123,7 +123,7 @@ Optional advanced audit:
 
 - `AuditLog.Read.All`
 
-`Reports.Read.All` still requires a supported Microsoft Entra role such as Reports Reader or a broader admin role. `AuditLog.Read.All` is only needed if the operator enables last sign-in summaries.
+`RoleManagement.Read.All` enables admin role inventory for the security section. `Reports.Read.All` still requires a supported Microsoft Entra role such as Reports Reader or a broader admin role. `AuditLog.Read.All` is used for last sign-in summaries and MFA registration reporting.
 
 ## Known Graph caveats
 
@@ -138,26 +138,19 @@ Optional advanced audit:
 
 - Node.js `>= 22.13.0`
 - npm `>= 10`
-- Ruby `>= 3.4`
-- Bundler `>= 2.6`
-
 ### Install
 
 ```bash
 npm install
-npm run blog:install
 ```
 
 ### Run locally
 
 ```bash
 npm run dev
-npm run dev:blog
 ```
 
-`npm run dev` starts the Astro main site and login surface.
-
-`npm run dev:blog` starts the Jekyll blog independently on port `4001`.
+`npm run dev` starts the full Astro site, including `/blog`.
 
 ### Quality checks
 
@@ -171,7 +164,7 @@ npm run build
 
 ### Playwright smoke tests
 
-`npm run test:e2e` builds the combined Astro + Jekyll output first, then serves the final `dist` folder for browser smoke tests.
+`npm run test:e2e` builds the Astro site first, then serves the final `dist` folder for browser smoke tests.
 
 ## Runtime configuration
 
@@ -209,7 +202,7 @@ The repository includes:
 - `.github/workflows/deploy-pages.yml`
 - `.github/workflows/codeql.yml`
 
-`deploy-pages.yml` materializes `runtime-config.json` from GitHub repository variables, validates the resolved config, installs Ruby gems for the Jekyll blog, builds Astro and Jekyll into a shared `dist` directory, and deploys the final artifact to GitHub Pages.
+`deploy-pages.yml` materializes `runtime-config.json` from GitHub repository variables, validates the resolved config, builds the Astro site into `dist`, and deploys the final artifact to GitHub Pages.
 
 The workflow uses `actions/configure-pages@v5` with `enablement: true` so the first deployment can create the Pages site automatically when the repository has not been enabled yet.
 

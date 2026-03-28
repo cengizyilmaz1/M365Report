@@ -1,0 +1,79 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import GuideCard from "@/site/partials/GuideCard.astro";
+import { sortBlogEntries, toBlogSummary } from "@/lib/blog";
+import { withBase } from "@/lib/paths";
+import "@/styles/blog.css";
+
+const entries = sortBlogEntries(await getCollection("blog"));
+const featuredEntry = entries.find((entry) => entry.data.featured) ?? entries[0];
+const featuredGuide = featuredEntry ? toBlogSummary(featuredEntry) : null;
+const guideCatalog = entries
+  .filter((entry) => entry.id !== featuredEntry?.id)
+  .map((entry) => toBlogSummary(entry));
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  name: "M365 Tenant Reporter Blog",
+  description: "Feature guides and product documentation for M365 Tenant Reporter.",
+  url: "https://m365report.cengizyilmaz.net/blog"
+};
+---
+
+<BaseLayout
+  title="Blog | M365 Tenant Reporter"
+  description="Feature guides and documentation for users, licenses, groups, mailbox insights, exports, permissions, and security."
+  keywords={[
+    "m365 reporting blog",
+    "microsoft 365 reporting guides",
+    "m365 tenant reporter documentation"
+  ]}
+  structuredData={structuredData}
+>
+  <section class="section-space">
+    <div class="page-frame">
+      <div class="hero-glow glass-panel rounded-[2.4rem] px-6 py-10 md:px-10 md:py-14">
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-sky-500">Blog</p>
+        <h1 class="mt-4 max-w-3xl text-balance text-4xl font-semibold leading-tight text-ink-950 md:text-6xl">
+          Learn how each report module works.
+        </h1>
+        <p class="mt-4 max-w-3xl text-lg leading-8 text-ink-700">
+          Detailed guides for users, licenses, group counts, shared mailboxes, exports, permissions, and zero-storage reporting.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {featuredGuide && (
+    <section class="pb-6">
+      <div class="page-frame">
+        <a href={withBase(`/blog/${featuredGuide.slug}/`)} class="blog-featured-card">
+          <div class="blog-featured-badge">Featured guide</div>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <span class="badge badge-sky text-[11px]">{featuredGuide.category}</span>
+            <span class="badge badge-muted text-[11px]">{featuredGuide.readingTime}</span>
+            <span class="badge badge-muted text-[11px]">{featuredGuide.publishedAt}</span>
+          </div>
+          <h2 class="mt-5 text-3xl font-semibold leading-tight text-ink-950">{featuredGuide.title}</h2>
+          <p class="mt-4 max-w-3xl text-base leading-8 text-ink-700">{featuredGuide.excerpt}</p>
+          <span class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-sky-500">
+            Read guide
+            <span aria-hidden="true">→</span>
+          </span>
+        </a>
+      </div>
+    </section>
+  )}
+
+  <section class="section-space pt-4">
+    <div class="page-frame">
+      <div class="blog-post-grid">
+        {guideCatalog.map((guide) => (
+          <GuideCard guide={guide} />
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

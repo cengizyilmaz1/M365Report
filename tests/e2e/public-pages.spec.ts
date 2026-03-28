@@ -24,7 +24,7 @@ test("blog routes render discoverable guidance content", async ({ page }) => {
 
   await expect(page.locator("meta[property='article:published_time']")).toHaveCount(1);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(page.getByText(/The total users metric is the first number/i)).toBeVisible();
+  await expect(page.getByText(/The total users metric is the most fundamental number/i)).toBeVisible();
 });
 
 test("static about and privacy pages render from dedicated routes", async ({ page }) => {
