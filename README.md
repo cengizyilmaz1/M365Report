@@ -211,6 +211,10 @@ The repository includes:
 
 `deploy-pages.yml` materializes `runtime-config.json` from GitHub repository variables, validates the resolved config, installs Ruby gems for the Jekyll blog, builds Astro and Jekyll into a shared `dist` directory, and deploys the final artifact to GitHub Pages.
 
+The workflow uses `actions/configure-pages@v5` with `enablement: true` so the first deployment can create the Pages site automatically when the repository has not been enabled yet.
+
+For the custom domain, configure `m365report.cengizyilmaz.net` in the repository Pages settings. When Pages is deployed through GitHub Actions, relying on repository-side `CNAME` files is not the durable source of truth.
+
 Recommended repository variables:
 
 - `PUBLIC_CLIENT_ID`
