@@ -7,14 +7,16 @@ interface Props {
 const { title, description } = Astro.props;
 ---
 
-<section class="section-space pt-4">
-  <div class="page-frame space-y-5">
+<section class="section-space pt-2">
+  <div class="page-frame space-y-6">
     <div class="max-w-3xl space-y-3">
-      <h2 class="text-balance text-2xl font-semibold text-ink-950 md:text-3xl">{title}</h2>
-      {description && <p class="text-base leading-8 text-ink-700">{description}</p>}
+      <h2 class="text-balance text-2xl font-bold tracking-tight text-ink-950 md:text-3xl" style="font-family: var(--font-display);">
+        {title}
+      </h2>
+      {description && <p class="text-base leading-8 text-ink-600">{description}</p>}
     </div>
 
-    <div class="glass-panel rounded-[2rem] px-6 py-7 md:px-8 md:py-8">
+    <div class="glass-panel rounded-2xl p-6 md:p-8">
       <slot />
     </div>
   </div>

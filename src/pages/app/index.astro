@@ -10,20 +10,34 @@ import { withBase } from "@/lib/paths";
 >
   <section class="section-space">
     <div class="page-frame">
-      <div class="glass-panel rounded-[2rem] px-6 py-16 text-center">
-        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-sky-500">Route updated</p>
-        <h1 class="mt-4 text-4xl font-semibold text-ink-950">The reporting flow now starts at /login.</h1>
-        <p class="mx-auto mt-4 max-w-xl text-base leading-8 text-ink-700">
+      <div class="glass-panel rounded-3xl px-6 py-16 text-center md:py-20">
+        <div class="mb-6 flex justify-center">
+          <div class="icon-container-lg bg-sky-500/10 text-sky-500">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </div>
+        </div>
+        <p class="text-sm font-semibold uppercase tracking-widest text-sky-500">Route updated</p>
+        <h1 class="mt-3 text-3xl font-bold tracking-tight text-ink-950 md:text-4xl" style="font-family: var(--font-display);">The reporting flow now starts at /login.</h1>
+        <p class="mx-auto mt-4 max-w-xl text-base leading-8 text-ink-600">
           You are being redirected to the main sign-in and reporting page.
         </p>
         <div class="mt-8 flex justify-center">
-          <a href={withBase("/login")} class="rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-white">Go to login</a>
+          <a href={withBase("/login")} class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+            Go to login
+          </a>
         </div>
       </div>
     </div>
   </section>
 
-  <script is:inline>
-    window.location.replace(`${withBase("/login")}`);
+  <script is:inline define:vars={{ loginPath: withBase("/login") }}>
+    window.location.replace(loginPath);
   </script>
 </BaseLayout>

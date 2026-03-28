@@ -10,15 +10,37 @@ import { withBase } from "@/lib/paths";
 >
   <section class="section-space">
     <div class="page-frame">
-      <div class="glass-panel rounded-[2rem] px-6 py-16 text-center">
-        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-sky-500">404</p>
-        <h1 class="mt-4 text-4xl font-semibold text-ink-950">This route does not exist.</h1>
-        <p class="mx-auto mt-4 max-w-xl text-base leading-8 text-ink-700">
+      <div class="glass-panel rounded-3xl px-6 py-16 text-center md:py-20">
+        <div class="mb-6 flex justify-center">
+          <div class="icon-container-lg bg-sky-500/10 text-sky-500">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              <line x1="8" y1="11" x2="14" y2="11" />
+            </svg>
+          </div>
+        </div>
+        <p class="text-sm font-semibold uppercase tracking-widest text-sky-500">404</p>
+        <h1 class="mt-3 text-3xl font-bold tracking-tight text-ink-950 md:text-4xl" style="font-family: var(--font-display);">This route does not exist.</h1>
+        <p class="mx-auto mt-4 max-w-xl text-base leading-8 text-ink-600">
           Head back to the home page or open the login route to start reporting.
         </p>
         <div class="mt-8 flex justify-center gap-3">
-          <a href={withBase("/")} class="rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-white">Go home</a>
-          <a href={withBase("/login")} class="rounded-full border border-ink-900/10 px-5 py-3 text-sm font-semibold text-ink-800">Open login</a>
+          <a href={withBase("/")} class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            Go home
+          </a>
+          <a href={withBase("/login")} class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+            Open login
+          </a>
         </div>
       </div>
     </div>

@@ -4,58 +4,109 @@ import { withBase } from "@/lib/paths";
 
 <section class="section-space">
   <div class="page-frame">
-    <div class="hero-glow glass-panel rounded-[2.4rem] px-6 py-10 md:px-10 md:py-14">
-      <div class="grid gap-8 xl:grid-cols-[1.14fr_0.86fr] xl:items-start">
-        <div class="space-y-6">
-          <div class="inline-flex rounded-full border border-sky-500/15 bg-sky-500/8 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-sky-500">
-            Read-only SaaS reporting
+    <div class="hero-glow glass-panel rounded-3xl px-6 py-12 md:px-12 md:py-16">
+      <div class="grid gap-10 xl:grid-cols-[1.15fr_0.85fr] xl:items-center">
+        <div class="space-y-6 animate-fade-up">
+          <div class="flex flex-wrap gap-2">
+            <span class="badge badge-sky">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              Read-only SaaS
+            </span>
+            <span class="badge badge-mint">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              Zero-storage
+            </span>
+            <span class="badge badge-violet">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              Graph-powered
+            </span>
           </div>
-          <h1 class="max-w-3xl text-balance text-4xl font-semibold leading-tight text-ink-950 md:text-6xl">
-            Generate Microsoft 365 tenant reports without storing tenant data.
+
+          <h1 class="max-w-3xl text-balance text-4xl font-bold leading-[1.1] tracking-tight text-ink-950 md:text-[3.5rem]" style="font-family: var(--font-display);">
+            Generate Microsoft 365 tenant reports <span class="gradient-text">without storing tenant data.</span>
           </h1>
-          <p class="max-w-3xl text-lg leading-8 text-ink-700">
-            M365 Tenant Reporter gives you a fast browser-based reporting flow for users, licenses, groups, shared mailboxes, and local exports. No remediation. No persistent tenant data store.
+
+          <p class="max-w-2xl text-lg leading-8 text-ink-600">
+            A fast browser-based reporting flow for users, licenses, groups, shared mailboxes, and local exports. No remediation. No persistent data store.
           </p>
 
-          <div class="flex flex-wrap gap-3">
-            <a href={withBase("/login")} class="rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-ink-800">
-              Open login
+          <div class="flex flex-wrap items-center gap-3 pt-1">
+            <a href={withBase("/login")} class="btn-primary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+              Start reporting
             </a>
-            <a
-              href={withBase("/blog")}
-              class="rounded-full border border-ink-900/10 bg-white/90 px-5 py-3 text-sm font-semibold text-ink-800 transition hover:-translate-y-0.5 hover:border-ink-900/25"
-            >
-              Read feature guides
+            <a href={withBase("/blog")} class="btn-secondary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+              Feature guides
             </a>
-          </div>
-
-          <div class="flex flex-wrap gap-2 pt-2">
-            <span class="rounded-full bg-sand-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-ink-700">Read-only</span>
-            <span class="rounded-full bg-sand-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-ink-700">Zero-storage</span>
-            <span class="rounded-full bg-sand-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-ink-700">Graph-based</span>
-            <span class="rounded-full bg-sand-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-ink-700">Local exports</span>
           </div>
         </div>
 
-        <div class="grid gap-4">
-          <div class="fine-border rounded-[1.8rem] bg-white/92 p-6">
-            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-sky-500">What teams get</p>
-            <p class="mt-4 text-sm leading-7 text-ink-700">
-              One clean login route, one browser session, and one export flow that keeps the product easy to trust and easy to operate.
-            </p>
+        <div class="grid gap-3 animate-fade-up" style="animation-delay: 0.15s;">
+          <div class="glass-panel rounded-2xl p-6">
+            <div class="flex items-start gap-4">
+              <div class="icon-container-lg bg-sky-500/10 text-sky-500">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-widest text-sky-500">Reports</p>
+                <p class="mt-2 text-xl font-bold text-ink-950">Users, licenses, groups</p>
+                <p class="mt-1 text-sm text-ink-600">Full tenant inventory from Microsoft Graph</p>
+              </div>
+            </div>
           </div>
-          <div class="grid gap-4 md:grid-cols-3 xl:grid-cols-1">
-            <div class="fine-border rounded-[1.5rem] bg-white/90 p-5">
-              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink-600">Reports</p>
-              <p class="mt-3 text-2xl font-semibold text-ink-950">Users, licenses, groups</p>
+
+          <div class="grid gap-3 md:grid-cols-2">
+            <div class="glass-panel rounded-2xl p-5">
+              <div class="flex items-start gap-3">
+                <div class="icon-container bg-mint-500/10 text-mint-500">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-widest text-mint-500">Exports</p>
+                  <p class="mt-1.5 text-lg font-bold text-ink-950">CSV, JSON, Excel, HTML</p>
+                </div>
+              </div>
             </div>
-            <div class="fine-border rounded-[1.5rem] bg-white/90 p-5">
-              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink-600">Exports</p>
-              <p class="mt-3 text-2xl font-semibold text-ink-950">CSV, JSON, Excel, HTML</p>
-            </div>
-            <div class="fine-border rounded-[1.5rem] bg-white/90 p-5">
-              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink-600">Privacy</p>
-              <p class="mt-3 text-2xl font-semibold text-ink-950">Session-only data</p>
+
+            <div class="glass-panel rounded-2xl p-5">
+              <div class="flex items-start gap-3">
+                <div class="icon-container bg-violet-500/10 text-violet-500">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-widest text-violet-500">Privacy</p>
+                  <p class="mt-1.5 text-lg font-bold text-ink-950">Session-only data</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

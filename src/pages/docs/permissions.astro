@@ -30,7 +30,7 @@ const structuredData = [
     mainEntity: [
       {
         "@type": "Question",
-        name: "Does the app request write permissions?",
+        name: "Does M365 Tenant Reporter request write permissions?",
         acceptedAnswer: {
           "@type": "Answer",
           text: "No. The delegated Microsoft Graph scopes are read-focused and the product is designed for reporting only."
@@ -43,6 +43,14 @@ const structuredData = [
           "@type": "Answer",
           text: "AuditLog.Read.All is optional and only needed when the operator wants last sign-in visibility in the login-based reporting flow."
         }
+      },
+      {
+        "@type": "Question",
+        name: "What Microsoft Entra role is required for Reports.Read.All?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Reports.Read.All requires a supported Microsoft Entra role such as Reports Reader or a broader admin role to access usage and activity data."
+        }
       }
     ]
   }
@@ -51,11 +59,12 @@ const structuredData = [
 
 <BaseLayout
   title="Permissions | M365 Tenant Reporter"
-  description="Understand the delegated Microsoft Graph scopes used by M365 Tenant Reporter."
+  description="Understand the delegated Microsoft Graph scopes used by M365 Tenant Reporter for read-only tenant inventory and activity reporting."
   keywords={[
     "m365 delegated permissions",
     "microsoft graph consent guide",
-    "reports.read.all explanation"
+    "reports.read.all explanation",
+    "microsoft 365 graph scopes"
   ]}
   structuredData={structuredData}
 >
@@ -67,47 +76,104 @@ const structuredData = [
 
   <SectionBlock title="Permission groups">
     <div class="grid gap-4 md:grid-cols-3">
-      <article class="fine-border rounded-[1.5rem] bg-white p-6">
-        <h3 class="text-lg font-semibold">Core</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">openid, profile, email, User.Read, User.Read.All, GroupMember.Read.All, LicenseAssignment.Read.All, MailboxSettings.Read</p>
+      <article class="fine-border card-hover rounded-2xl bg-white p-6">
+        <div class="icon-container bg-sky-500/10 text-sky-500 mb-4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-ink-950">Core</h3>
+        <p class="mt-2 text-sm leading-7 text-ink-600">openid, profile, email, User.Read, User.Read.All, GroupMember.Read.All, LicenseAssignment.Read.All, MailboxSettings.Read</p>
       </article>
-      <article class="fine-border rounded-[1.5rem] bg-white p-6">
-        <h3 class="text-lg font-semibold">Reports</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">Reports.Read.All for Office 365 active users, Teams activity, mailbox usage, and OneDrive usage.</p>
+      <article class="fine-border card-hover rounded-2xl bg-white p-6">
+        <div class="icon-container bg-mint-500/10 text-mint-500 mb-4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-ink-950">Reports</h3>
+        <p class="mt-2 text-sm leading-7 text-ink-600">Reports.Read.All for Office 365 active users, Teams activity, mailbox usage, and OneDrive usage.</p>
       </article>
-      <article class="fine-border rounded-[1.5rem] bg-white p-6">
-        <h3 class="text-lg font-semibold">Advanced audit</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">AuditLog.Read.All is optional and only needed when last sign-in summaries are explicitly enabled.</p>
+      <article class="fine-border card-hover rounded-2xl bg-white p-6">
+        <div class="icon-container bg-violet-500/10 text-violet-500 mb-4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-ink-950">Advanced audit</h3>
+        <p class="mt-2 text-sm leading-7 text-ink-600">AuditLog.Read.All is optional and only needed when last sign-in summaries are explicitly enabled.</p>
       </article>
     </div>
   </SectionBlock>
 
   <SectionBlock title="How to explain the scope model internally">
     <div class="grid gap-4 md:grid-cols-2">
-      <article class="fine-border rounded-[1.5rem] bg-white p-6">
-        <h3 class="text-lg font-semibold text-ink-950">Core reporting stays read-only</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">
-          The core scope set exists so the app can inventory users, groups, license assignments, and mailbox purpose without crossing into management or remediation.
-        </p>
+      <article class="fine-border card-hover rounded-2xl bg-white p-6">
+        <div class="flex items-start gap-4">
+          <div class="icon-container bg-sky-500/10 text-sky-500">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-ink-950">Core reporting stays read-only</h3>
+            <p class="mt-2 text-sm leading-7 text-ink-600">
+              The core scope set exists so the app can inventory users, groups, license assignments, and mailbox purpose without crossing into management or remediation.
+            </p>
+          </div>
+        </div>
       </article>
-      <article class="fine-border rounded-[1.5rem] bg-white p-6">
-        <h3 class="text-lg font-semibold text-ink-950">Optional scopes stay optional</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">
-          Usage and audit capabilities are separated so operators can keep the initial consent boundary tight when they only need inventory reporting.
-        </p>
+      <article class="fine-border card-hover rounded-2xl bg-white p-6">
+        <div class="flex items-start gap-4">
+          <div class="icon-container bg-mint-500/10 text-mint-500">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+              <line x1="9" y1="3" x2="9" y2="21" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-ink-950">Optional scopes stay optional</h3>
+            <p class="mt-2 text-sm leading-7 text-ink-600">
+              Usage and audit capabilities are separated so operators can keep the initial consent boundary tight when they only need inventory reporting.
+            </p>
+          </div>
+        </div>
       </article>
     </div>
   </SectionBlock>
 
   <SectionBlock title="Related reading">
     <div class="grid gap-4 md:grid-cols-2">
-      <a href={withBase("/blog/permissions-consent-guide")} class="fine-border rounded-[1.5rem] bg-white p-6 transition hover:border-ink-900/16 hover:bg-sand-100">
-        <h3 class="text-lg font-semibold text-ink-950">Full permissions and consent guide</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">Read the longer explanation of why each delegated scope exists and when optional audit access should remain off.</p>
+      <a href={withBase("/blog/permissions-consent-guide")} class="group fine-border rounded-2xl bg-white p-6 transition hover:border-sky-500/20 hover:bg-sky-500/[0.02]">
+        <div class="flex items-start gap-4">
+          <div class="icon-container bg-sky-500/10 text-sky-500">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-ink-950 group-hover:text-sky-500 transition">Full permissions and consent guide</h3>
+            <p class="mt-2 text-sm leading-7 text-ink-600">Read the longer explanation of why each delegated scope exists and when optional audit access should remain off.</p>
+          </div>
+        </div>
       </a>
-      <a href={withBase(siteConfig.loginPath)} class="fine-border rounded-[1.5rem] bg-white p-6 transition hover:border-ink-900/16 hover:bg-sand-100">
-        <h3 class="text-lg font-semibold text-ink-950">Open the consent flow</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">Send users to the login page when they are ready to review scopes and authorize a reporting session.</p>
+      <a href={withBase(siteConfig.loginPath)} class="group fine-border rounded-2xl bg-white p-6 transition hover:border-sky-500/20 hover:bg-sky-500/[0.02]">
+        <div class="flex items-start gap-4">
+          <div class="icon-container bg-mint-500/10 text-mint-500">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-ink-950 group-hover:text-sky-500 transition">Open the consent flow</h3>
+            <p class="mt-2 text-sm leading-7 text-ink-600">Send users to the login page when they are ready to review scopes and authorize a reporting session.</p>
+          </div>
+        </div>
       </a>
     </div>
   </SectionBlock>

@@ -5,61 +5,106 @@ import { resolveHref, withBase } from "@/lib/paths";
 const currentPath = Astro.url.pathname.replace(/\/+$/, "") || "/";
 ---
 
-<header class="sticky top-0 z-50 pt-4">
+<header class="sticky top-0 z-50 pt-3 pb-1">
   <div class="page-frame">
-    <div class="glass-panel rounded-[1.75rem] px-5 py-4 md:px-6">
-      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <a href={withBase("/")} class="flex items-center gap-4">
-          <span class="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-linear-to-br from-sky-400/85 to-ink-900 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-lg">
-            M
+    <nav class="glass-panel rounded-2xl px-4 py-3 md:px-6" aria-label="Main navigation">
+      <div class="flex items-center justify-between">
+        <a href={withBase("/")} class="group flex items-center gap-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-violet-500 shadow-lg shadow-sky-500/20 transition group-hover:shadow-sky-500/30 group-hover:scale-105">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
           </span>
           <div>
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-ink-950">{siteConfig.name}</p>
-            <p class="mt-1 text-xs text-ink-600">Read-only tenant reporting for Microsoft 365</p>
+            <p class="text-sm font-bold tracking-tight text-ink-950">{siteConfig.shortName}</p>
+            <p class="text-[11px] text-ink-600">Microsoft 365 Reporting</p>
           </div>
         </a>
 
-        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
-          <nav class="flex flex-wrap items-center gap-2">
-            {siteNavigation.map((item) => {
-              const normalizedItemHref = item.href.replace(/\/+$/, "") || "/";
-              const isActive =
-                normalizedItemHref === "/" ? currentPath === "/" : currentPath.startsWith(normalizedItemHref);
+        <div class="hidden items-center gap-1 lg:flex">
+          {siteNavigation.map((item) => {
+            const normalizedItemHref = item.href.replace(/\/+$/, "") || "/";
+            const isActive =
+              normalizedItemHref === "/" ? currentPath === "/" : currentPath.startsWith(normalizedItemHref);
 
-              return (
-                <a
-                  href={resolveHref(item)}
-                  class:list={[
-                    "rounded-full px-4 py-2 text-sm font-semibold transition",
-                    isActive
-                      ? "bg-ink-900 text-white shadow-sm"
-                      : "text-ink-700 hover:bg-white hover:text-ink-950"
-                  ]}
-                >
-                  {item.label}
-                </a>
-              );
-            })}
-          </nav>
-
-          <div class="flex flex-wrap items-center gap-3">
-            {headerActions.map((item) => (
+            return (
               <a
                 href={resolveHref(item)}
                 class:list={[
-                  "rounded-full px-4 py-2.5 text-sm font-semibold transition shadow-sm",
-                  item.tone === "primary" && "bg-ink-900 text-white hover:-translate-y-0.5 hover:bg-ink-800",
-                  item.tone === "secondary" &&
-                    "border border-ink-900/10 bg-white/90 text-ink-800 hover:-translate-y-0.5 hover:border-ink-900/25 hover:bg-white"
+                  "relative rounded-xl px-3.5 py-2 text-sm font-medium transition",
+                  isActive
+                    ? "bg-ink-900/5 text-ink-950 font-semibold"
+                    : "text-ink-600 hover:text-ink-950 hover:bg-ink-900/[0.03]"
                 ]}
-                title={item.description}
+                aria-current={isActive ? "page" : undefined}
               >
                 {item.label}
               </a>
-            ))}
-          </div>
+            );
+          })}
+        </div>
+
+        <div class="flex items-center gap-2">
+          {headerActions.map((item) => (
+            <a
+              href={resolveHref(item)}
+              class="btn-primary py-2.5 px-5 text-[13px]"
+              title={item.description}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+              {item.label}
+            </a>
+          ))}
+
+          <button
+            type="button"
+            class="flex h-10 w-10 items-center justify-center rounded-xl text-ink-600 hover:bg-ink-900/5 hover:text-ink-950 lg:hidden"
+            aria-label="Toggle menu"
+            id="mobile-menu-toggle"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="4" y1="7" x2="20" y2="7" />
+              <line x1="4" y1="12" x2="20" y2="12" />
+              <line x1="4" y1="17" x2="20" y2="17" />
+            </svg>
+          </button>
         </div>
       </div>
-    </div>
+
+      <div id="mobile-menu" class="hidden border-t border-ink-900/5 mt-3 pt-3 lg:hidden">
+        <div class="flex flex-col gap-1">
+          {siteNavigation.map((item) => {
+            const normalizedItemHref = item.href.replace(/\/+$/, "") || "/";
+            const isActive =
+              normalizedItemHref === "/" ? currentPath === "/" : currentPath.startsWith(normalizedItemHref);
+
+            return (
+              <a
+                href={resolveHref(item)}
+                class:list={[
+                  "rounded-xl px-4 py-2.5 text-sm font-medium transition",
+                  isActive
+                    ? "bg-ink-900/5 text-ink-950 font-semibold"
+                    : "text-ink-600 hover:text-ink-950 hover:bg-ink-900/[0.03]"
+                ]}
+              >
+                {item.label}
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </nav>
   </div>
 </header>
+
+<script is:inline>
+  document.getElementById("mobile-menu-toggle")?.addEventListener("click", function() {
+    document.getElementById("mobile-menu")?.classList.toggle("hidden");
+  });
+</script>

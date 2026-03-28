@@ -1,46 +1,80 @@
 ---
-import { footerLinkGroups, siteConfig } from "@/lib/site";
+import { footerLinkGroups, socialLinks, siteConfig } from "@/lib/site";
 import { resolveHref, withBase } from "@/lib/paths";
+
+const socialIcons: Record<string, string> = {
+  X: '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>',
+  Facebook: '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
+  Reddit: '<circle cx="12" cy="12" r="10"/><path d="M16.5 13.5c0 1.38-2.01 2.5-4.5 2.5s-4.5-1.12-4.5-2.5"/>',
+  GitHub: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>',
+  YouTube: '<path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>',
+  LinkedIn: '<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>'
+};
 ---
 
-<footer class="pt-6">
+<footer class="mt-8 pb-6">
   <div class="page-frame">
-    <div class="glass-panel rounded-[2rem] px-6 py-8 md:px-8">
-      <div class="grid gap-8 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
-        <div class="space-y-4">
-          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-ink-700">{siteConfig.name}</p>
-          <h2 class="max-w-md text-2xl font-semibold leading-tight text-ink-950">Read-only Microsoft 365 reporting with a cleaner path from sign-in to export.</h2>
-          <p class="max-w-xl text-sm leading-7 text-ink-700">
-            Use the public site to understand the product, the login route to generate reports, and the blog to learn how each module works.
+    <div class="glass-panel rounded-3xl p-8 md:p-10">
+      <div class="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div class="space-y-5">
+          <div class="flex items-center gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-violet-500 shadow-lg shadow-sky-500/20">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+            </span>
+            <p class="text-sm font-bold tracking-tight text-ink-950">{siteConfig.name}</p>
+          </div>
+          <p class="max-w-sm text-sm leading-7 text-ink-600">
+            Read-only Microsoft 365 tenant reporting. Browser-only data collection with local-first exports.
           </p>
-          <div class="flex flex-wrap gap-3 pt-2">
-            <a
-              href={withBase(siteConfig.loginPath)}
-              class="rounded-full bg-ink-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-ink-800"
-            >
+          <div class="flex flex-wrap gap-3 pt-1">
+            <a href={withBase(siteConfig.loginPath)} class="btn-primary py-2.5 px-5 text-[13px]">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
               Open login
             </a>
-            <a
-              href={`${siteConfig.siteUrl}${siteConfig.loginPath}`}
-              class="rounded-full border border-ink-900/10 bg-white/90 px-4 py-2.5 text-sm font-semibold text-ink-800 transition hover:-translate-y-0.5 hover:border-ink-900/25"
-            >
-              {`${siteConfig.domain}/login`}
-            </a>
+          </div>
+
+          <div class="flex items-center gap-2 pt-2">
+            {socialLinks.map((link) => (
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                class="flex h-9 w-9 items-center justify-center rounded-xl text-ink-500 transition hover:bg-ink-900/5 hover:text-ink-900"
+                title={link.label}
+                aria-label={link.label}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill={link.label === "X" ? "currentColor" : "none"} stroke={link.label === "X" ? "none" : "currentColor"} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={socialIcons[link.label] ?? ""} />
+              </a>
+            ))}
           </div>
         </div>
 
         {footerLinkGroups.map((group) => (
-          <div class="space-y-3">
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-ink-700">{group.title}</p>
-            <div class="flex flex-col gap-2 text-sm text-ink-700">
+          <div class="space-y-4">
+            <p class="text-xs font-semibold uppercase tracking-widest text-ink-500">{group.title}</p>
+            <div class="flex flex-col gap-2.5">
               {group.links.map((item) => (
                 <a
                   href={resolveHref(item)}
-                  class="transition hover:translate-x-0.5 hover:text-ink-950"
+                  class="group flex items-center gap-2 text-sm text-ink-600 transition hover:text-ink-950"
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noreferrer" : undefined}
                 >
-                  {item.label}
+                  <span class="transition group-hover:translate-x-0.5">{item.label}</span>
+                  {item.external && (
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 transition group-hover:opacity-50">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                  )}
                 </a>
               ))}
             </div>
@@ -48,8 +82,17 @@ import { resolveHref, withBase } from "@/lib/paths";
         ))}
       </div>
 
-      <div class="mt-8 border-t border-ink-900/8 pt-5 text-xs uppercase tracking-[0.16em] text-ink-600">
-        <p>Read-only Microsoft Graph reporting. Browser-only data collection. Local-first exports.</p>
+      <div class="divider mt-8 mb-6"></div>
+
+      <div class="flex flex-col items-center justify-between gap-3 text-xs text-ink-500 sm:flex-row">
+        <p>&copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
+        <p class="flex items-center gap-1.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          Browser-only data collection. Zero server storage.
+        </p>
       </div>
     </div>
   </div>

@@ -38,29 +38,41 @@ const structuredDataEntries = structuredData ? (Array.isArray(structuredData) ? 
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="keywords" content={keywords.join(", ")} />
     <meta name="author" content={siteConfig.authorName} />
-    <meta name="theme-color" content="#07111f" />
+    <meta name="theme-color" content="#0ea5e9" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="application-name" content={siteConfig.name} />
+
     <link rel="stylesheet" href={withBase("/assets/brand-shell.css")} />
     <link rel="canonical" href={canonicalUrl} />
+
     {noindex && <meta name="robots" content="noindex,nofollow" />}
+    {!noindex && <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />}
+
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={pageType} />
     <meta property="og:site_name" content={siteConfig.name} />
     <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:locale" content="en_US" />
+
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content={siteConfig.socialHandle} />
     <meta name="twitter:creator" content={siteConfig.socialHandle} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
     {publishedTime && <meta property="article:published_time" content={publishedTime} />}
     {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
     {structuredDataEntries.map((entry) => (

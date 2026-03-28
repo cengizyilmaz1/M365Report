@@ -14,13 +14,33 @@ const structuredData = [
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web browser",
     description: siteConfig.defaultDescription,
-    url: siteConfig.siteUrl
+    url: siteConfig.siteUrl,
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD"
+    },
+    featureList: [
+      "Microsoft 365 user inventory reporting",
+      "License capacity and consumption analysis",
+      "Group membership counting",
+      "Shared mailbox identification",
+      "Activity report collection",
+      "CSV, JSON, Excel, and HTML exports",
+      "Browser-only data collection",
+      "Zero server storage"
+    ]
   },
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: siteConfig.name,
-    url: siteConfig.siteUrl
+    url: siteConfig.siteUrl,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${siteConfig.siteUrl}/blog?q={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
   },
   {
     "@context": "https://schema.org",
@@ -39,12 +59,14 @@ const structuredData = [
 
 <BaseLayout
   title={`${siteConfig.name} | Read-only Microsoft 365 reporting`}
-  description="Read-only Microsoft 365 tenant reporting with a clean login flow, browser-only Graph collection, and local export generation."
+  description="Read-only Microsoft 365 tenant reporting with a clean login flow, browser-only Graph collection, and local export generation. Users, licenses, groups, mailboxes, and activity reports."
   keywords={[
     ...siteConfig.defaultKeywords,
     "microsoft 365 reporting platform",
     "zero-storage saas reporting",
-    "browser-only microsoft graph reporting"
+    "browser-only microsoft graph reporting",
+    "m365 license usage report",
+    "microsoft 365 admin reporting tool"
   ]}
   structuredData={structuredData}
 >
@@ -52,20 +74,39 @@ const structuredData = [
 
   <SectionBlock
     title="Everything important is available from one clean login route"
-    description="The product site explains the platform, but `/login` is the main operational entry point for sign-in, report generation, and export."
+    description="The product site explains the platform, but /login is the main operational entry point for sign-in, report generation, and export."
   >
     <div class="grid gap-4 md:grid-cols-3">
-      <article class="fine-border card-hover rounded-[1.6rem] bg-white p-6">
-        <h3 class="text-lg font-semibold text-ink-950">Sign in</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">Use Microsoft Entra delegated access from the single trusted route: <strong>/login</strong>.</p>
+      <article class="fine-border card-hover rounded-2xl bg-white p-6">
+        <div class="icon-container bg-sky-500/10 text-sky-500 mb-4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+            <polyline points="10 17 15 12 10 7" />
+            <line x1="15" y1="12" x2="3" y2="12" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-ink-950">Sign in</h3>
+        <p class="mt-2 text-sm leading-7 text-ink-600">Use Microsoft Entra delegated access from the single trusted route: <strong class="text-ink-800">/login</strong>.</p>
       </article>
-      <article class="fine-border card-hover rounded-[1.6rem] bg-white p-6">
-        <h3 class="text-lg font-semibold text-ink-950">Generate</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">Collect users, licenses, groups, and mailbox insights inside the current browser session.</p>
+      <article class="fine-border card-hover rounded-2xl bg-white p-6">
+        <div class="icon-container bg-mint-500/10 text-mint-500 mb-4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-ink-950">Generate</h3>
+        <p class="mt-2 text-sm leading-7 text-ink-600">Collect users, licenses, groups, and mailbox insights inside the current browser session.</p>
       </article>
-      <article class="fine-border card-hover rounded-[1.6rem] bg-white p-6">
-        <h3 class="text-lg font-semibold text-ink-950">Export</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">Download clean CSV, JSON, Excel, or HTML files without keeping a persistent tenant dataset.</p>
+      <article class="fine-border card-hover rounded-2xl bg-white p-6">
+        <div class="icon-container bg-violet-500/10 text-violet-500 mb-4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-ink-950">Export</h3>
+        <p class="mt-2 text-sm leading-7 text-ink-600">Download clean CSV, JSON, Excel, or HTML files without keeping a persistent tenant dataset.</p>
       </article>
     </div>
   </SectionBlock>
