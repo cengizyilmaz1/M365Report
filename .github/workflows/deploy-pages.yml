@@ -1,0 +1,102 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.1
+          cache: npm
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4
+
+      - name: Resolve public site settings
+        shell: bash
+        run: |
+          if [[ -n "${{ vars.PUBLIC_BASE_PATH }}" ]]; then
+            BASE_PATH="${{ vars.PUBLIC_BASE_PATH }}"
+          else
+            BASE_PATH="/"
+          fi
+
+          if [[ -n "${{ vars.PUBLIC_SITE_URL }}" ]]; then
+            SITE_URL="${{ vars.PUBLIC_SITE_URL }}"
+          else
+            SITE_URL="https://m365report.cengizyilmaz.net"
+          fi
+
+          echo "PUBLIC_BASE_PATH=$BASE_PATH" >> "$GITHUB_ENV"
+          echo "PUBLIC_SITE_URL=$SITE_URL" >> "$GITHUB_ENV"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Jekyll dependencies
+        working-directory: blog
+        run: bundle install
+
+      - name: Materialize runtime config
+        env:
+          PUBLIC_APP_NAME: ${{ vars.PUBLIC_APP_NAME || 'M365 Tenant Reporter' }}
+          PUBLIC_AUTHORITY: ${{ vars.PUBLIC_AUTHORITY || 'https://login.microsoftonline.com/organizations' }}
+          PUBLIC_CLIENT_ID: ${{ vars.PUBLIC_CLIENT_ID }}
+          PUBLIC_KNOWN_AUTHORITIES: ${{ vars.PUBLIC_KNOWN_AUTHORITIES }}
+          PUBLIC_LOGIN_REDIRECT_PATH: ${{ vars.PUBLIC_LOGIN_REDIRECT_PATH || '/login' }}
+          PUBLIC_POST_LOGOUT_REDIRECT_PATH: ${{ vars.PUBLIC_POST_LOGOUT_REDIRECT_PATH || '/' }}
+          PUBLIC_CORE_SCOPES: ${{ vars.PUBLIC_CORE_SCOPES || 'openid,profile,email,User.Read,User.Read.All,GroupMember.Read.All,LicenseAssignment.Read.All,MailboxSettings.Read' }}
+          PUBLIC_REPORTS_SCOPES: ${{ vars.PUBLIC_REPORTS_SCOPES || 'Reports.Read.All' }}
+          PUBLIC_ADVANCED_AUDIT_SCOPES: ${{ vars.PUBLIC_ADVANCED_AUDIT_SCOPES || 'AuditLog.Read.All' }}
+          PUBLIC_ALLOW_AUDIT_OPT_IN: ${{ vars.PUBLIC_ALLOW_AUDIT_OPT_IN || 'true' }}
+        run: npm run config:materialize
+
+      - name: Validate runtime config
+        run: npm run validate:config:strict
+
+      - name: Build production site
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

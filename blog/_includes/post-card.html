@@ -1,0 +1,9 @@
+<a class="brand-post-card" href="{{ include.post.url | relative_url }}">
+  <p class="brand-kicker">{{ include.post.category }}</p>
+  <h3>{{ include.post.title }}</h3>
+  <p>{{ include.post.description | default: include.post.excerpt | strip_html }}</p>
+  <div class="brand-post-meta">
+    <span>{{ include.post.reading_time }}</span>
+    <span>{{ include.post.date | date: "%Y-%m-%d" }}</span>
+  </div>
+</a>

@@ -1,0 +1,77 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PageHero from "@/components/site/PageHero.astro";
+import LoginExperience from "@/features/auth/LoginExperience";
+import SectionBlock from "@/components/site/SectionBlock.astro";
+import { siteConfig } from "@/lib/site";
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Login | M365 Tenant Reporter",
+  url: `${siteConfig.siteUrl}${siteConfig.loginPath}`
+};
+---
+
+<BaseLayout
+  title="Login | M365 Tenant Reporter"
+  description="Use the dedicated login section to grant delegated Microsoft Graph access and open the reporting workspace."
+  keywords={[
+    "m365 tenant reporter login",
+    "microsoft entra delegated login",
+    "m365report login page"
+  ]}
+  structuredData={structuredData}
+>
+  <PageHero
+    eyebrow="Dedicated login section"
+    title="Use /login as the single trusted entry point for Microsoft Entra sign-in."
+    body="The login surface is intentionally separated from the marketing site and the blog so the permission review, consent flow, and app bootstrap remain clear and production-ready."
+  />
+
+  <section class="section-space pt-2">
+    <div class="page-frame grid gap-6 xl:grid-cols-[0.74fr_1.26fr]">
+      <div class="glass-panel rounded-[2rem] p-8">
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-sky-500">What this page does</p>
+        <div class="mt-5 space-y-4 text-sm leading-7 text-ink-700">
+          <p>Explains delegated Microsoft Graph access before the user leaves for Microsoft Entra.</p>
+          <p>Starts the browser-only sign-in flow that keeps tenant data out of long-lived storage.</p>
+          <p>Returns the user into the app workspace only after consent and token acquisition succeed.</p>
+        </div>
+
+        <div class="mt-8 grid gap-4">
+          <div class="fine-border rounded-[1.5rem] bg-white/90 p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink-600">Primary route</p>
+            <p class="mt-2 text-lg font-semibold text-ink-950">{`${siteConfig.domain}/login`}</p>
+          </div>
+          <div class="fine-border rounded-[1.5rem] bg-white/90 p-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-ink-600">Consent model</p>
+            <p class="mt-2 text-sm leading-7 text-ink-700">Delegated scopes only. Reporting data remains in-session and export generation stays local to the browser.</p>
+          </div>
+        </div>
+      </div>
+
+      <LoginExperience client:load />
+    </div>
+  </section>
+
+  <SectionBlock
+    title="Why the login route is separate"
+    description="Operationally, the login flow has different concerns than marketing or documentation content, so it deserves its own folder and page entry point."
+  >
+    <div class="grid gap-4 md:grid-cols-3">
+      <article class="fine-border rounded-[1.5rem] bg-white p-6">
+        <h3 class="text-lg font-semibold text-ink-950">Clear consent context</h3>
+        <p class="mt-3 text-sm leading-7 text-ink-700">Users know exactly when they are leaving the public site and entering a delegated Microsoft Entra authorization flow.</p>
+      </article>
+      <article class="fine-border rounded-[1.5rem] bg-white p-6">
+        <h3 class="text-lg font-semibold text-ink-950">Independent evolution</h3>
+        <p class="mt-3 text-sm leading-7 text-ink-700">The login experience can change with auth requirements without forcing a redesign of landing pages or blog templates.</p>
+      </article>
+      <article class="fine-border rounded-[1.5rem] bg-white p-6">
+        <h3 class="text-lg font-semibold text-ink-950">Production routing discipline</h3>
+        <p class="mt-3 text-sm leading-7 text-ink-700">A dedicated `/login` route gives operators and admins one canonical URL to bookmark, document, and approve.</p>
+      </article>
+    </div>
+  </SectionBlock>
+</BaseLayout>

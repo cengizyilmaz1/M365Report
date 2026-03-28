@@ -1,0 +1,90 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SectionBlock from "@/components/site/SectionBlock.astro";
+import HomeHero from "@/site/partials/HomeHero.astro";
+import CapabilityGrid from "@/site/partials/CapabilityGrid.astro";
+import GuidePreviewGrid from "@/site/partials/GuidePreviewGrid.astro";
+import { organizationProfiles, siteConfig } from "@/lib/site";
+
+const structuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: siteConfig.name,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web browser",
+    description: siteConfig.defaultDescription,
+    url: siteConfig.siteUrl
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteConfig.name,
+    url: siteConfig.siteUrl
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: siteConfig.name,
+    url: siteConfig.siteUrl,
+    founder: {
+      "@type": "Person",
+      name: siteConfig.authorName,
+      url: siteConfig.authorUrl
+    },
+    sameAs: organizationProfiles
+  }
+];
+---
+
+<BaseLayout
+  title={`${siteConfig.name} | Main product site`}
+  description="Explore the main product site for M365 Tenant Reporter, then move into the dedicated login flow or the SEO-focused Jekyll blog."
+  keywords={[
+    ...siteConfig.defaultKeywords,
+    "main product site",
+    "microsoft 365 reporting platform",
+    "zero-storage saas reporting"
+  ]}
+  structuredData={structuredData}
+>
+  <HomeHero />
+
+  <SectionBlock
+    title="A clear production-grade split between site, login, legal, and blog"
+    description="The architecture is intentionally separated so each concern can evolve without creating a flat or fragile codebase."
+  >
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <article class="fine-border card-hover rounded-[1.6rem] bg-white p-6">
+        <h3 class="text-lg font-semibold text-ink-950">Main site</h3>
+        <p class="mt-3 text-sm leading-7 text-ink-700">Marketing, positioning, and product narrative live in their own site folder and remain fast, indexable, and maintainable.</p>
+      </article>
+      <article class="fine-border card-hover rounded-[1.6rem] bg-white p-6">
+        <h3 class="text-lg font-semibold text-ink-950">Login section</h3>
+        <p class="mt-3 text-sm leading-7 text-ink-700">The Microsoft Entra sign-in flow is isolated so consent UX and authenticated app bootstrapping can evolve independently.</p>
+      </article>
+      <article class="fine-border card-hover rounded-[1.6rem] bg-white p-6">
+        <h3 class="text-lg font-semibold text-ink-950">Jekyll blog</h3>
+        <p class="mt-3 text-sm leading-7 text-ink-700">Long-form SEO content is managed in a separate Jekyll section with its own layouts, includes, and post templates.</p>
+      </article>
+      <article class="fine-border card-hover rounded-[1.6rem] bg-white p-6">
+        <h3 class="text-lg font-semibold text-ink-950">Legal pages</h3>
+        <p class="mt-3 text-sm leading-7 text-ink-700">Static information routes such as About and Privacy live under a dedicated legal domain folder instead of being mixed into landing content.</p>
+      </article>
+    </div>
+  </SectionBlock>
+
+  <SectionBlock
+    title="Product capabilities that are documented end-to-end"
+    description="The product site and the Jekyll blog explain the same feature surface, so the experience stays cohesive whether a visitor starts on the landing page or inside a guide."
+  >
+    <CapabilityGrid />
+  </SectionBlock>
+
+  <SectionBlock
+    title="SEO feature guides in the blog"
+    description="The Jekyll blog covers the reporting capabilities users care about most, from licensed and unlicensed users to export options and group member counts."
+  >
+    <GuidePreviewGrid />
+  </SectionBlock>
+</BaseLayout>

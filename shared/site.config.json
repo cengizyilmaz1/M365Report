@@ -1,0 +1,214 @@
+{
+  "siteConfig": {
+    "name": "M365 Tenant Reporter",
+    "shortName": "M365 Reporter",
+    "domain": "m365report.cengizyilmaz.net",
+    "siteUrl": "https://m365report.cengizyilmaz.net",
+    "loginPath": "/login",
+    "appPath": "/app",
+    "blogPath": "/blog",
+    "docsPath": "/docs/getting-started",
+    "aboutPath": "/about",
+    "privacyPath": "/privacy",
+    "authorName": "Cengiz Yilmaz",
+    "authorUrl": "https://cengizyilmaz.net",
+    "defaultDescription": "Zero-storage Microsoft 365 reporting with browser-only Microsoft Graph collection, downloadable exports, and a Jekyll-powered SEO blog.",
+    "defaultKeywords": [
+      "Microsoft 365 reporting",
+      "M365 tenant report",
+      "Microsoft Graph reporting",
+      "M365 license report",
+      "M365 user report",
+      "M365 group report",
+      "Microsoft 365 export tool",
+      "tenant inventory report"
+    ],
+    "socialHandle": "@cengizyilmaz_"
+  },
+  "siteNavigation": [
+    {
+      "href": "/",
+      "label": "Overview",
+      "description": "Main product landing page."
+    },
+    {
+      "href": "/blog",
+      "label": "Blog",
+      "description": "Jekyll-powered guides and feature documentation."
+    },
+    {
+      "href": "/docs/getting-started",
+      "label": "Docs",
+      "description": "Deployment and permission guidance."
+    },
+    {
+      "href": "/about",
+      "label": "About",
+      "description": "Product and maintainer background."
+    },
+    {
+      "href": "/privacy",
+      "label": "Privacy",
+      "description": "Zero-storage and browser-only handling details."
+    }
+  ],
+  "headerActions": [
+    {
+      "href": "/login",
+      "label": "Sign in",
+      "description": "Open the production login flow.",
+      "tone": "secondary"
+    },
+    {
+      "href": "/app",
+      "label": "Open app",
+      "description": "Open the authenticated reporting workspace.",
+      "tone": "primary"
+    }
+  ],
+  "ecosystemLinks": [
+    {
+      "href": "https://cengizyilmaz.net",
+      "label": "cengizyilmaz.net",
+      "description": "Personal hub and portfolio.",
+      "external": true
+    },
+    {
+      "href": "https://message.cengizyilmaz.net",
+      "label": "message.cengizyilmaz.net",
+      "description": "Message-focused companion project.",
+      "external": true
+    },
+    {
+      "href": "https://permissions.cengizyilmaz.net",
+      "label": "permissions.cengizyilmaz.net",
+      "description": "Microsoft 365 permission reference and related tooling.",
+      "external": true
+    },
+    {
+      "href": "https://tenant-find.cengizyilmaz.net",
+      "label": "tenant-find.cengizyilmaz.net",
+      "description": "Tenant discovery companion utility.",
+      "external": true
+    }
+  ],
+  "socialLinks": [
+    {
+      "href": "https://x.com/cengizyilmaz_",
+      "label": "X",
+      "external": true
+    },
+    {
+      "href": "https://www.facebook.com/cengizyilmz1",
+      "label": "Facebook",
+      "external": true
+    },
+    {
+      "href": "https://www.reddit.com/user/Accomplished-Tip7450/",
+      "label": "Reddit",
+      "external": true
+    },
+    {
+      "href": "https://github.com/cengizyilmaz1/",
+      "label": "GitHub",
+      "external": true
+    },
+    {
+      "href": "https://www.youtube.com/@cengizyilmz",
+      "label": "YouTube",
+      "external": true
+    },
+    {
+      "href": "https://linkedin.com/in/cengizyilmazz",
+      "label": "LinkedIn",
+      "external": true
+    }
+  ],
+  "footerLinkGroups": [
+    {
+      "title": "Product",
+      "links": [
+        {
+          "href": "/login",
+          "label": "Login"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/docs/getting-started",
+          "label": "Docs"
+        },
+        {
+          "href": "/about",
+          "label": "About"
+        },
+        {
+          "href": "/privacy",
+          "label": "Privacy"
+        }
+      ]
+    },
+    {
+      "title": "Network",
+      "links": [
+        {
+          "href": "https://cengizyilmaz.net",
+          "label": "cengizyilmaz.net",
+          "external": true
+        },
+        {
+          "href": "https://message.cengizyilmaz.net",
+          "label": "message.cengizyilmaz.net",
+          "external": true
+        },
+        {
+          "href": "https://permissions.cengizyilmaz.net",
+          "label": "permissions.cengizyilmaz.net",
+          "external": true
+        },
+        {
+          "href": "https://tenant-find.cengizyilmaz.net",
+          "label": "tenant-find.cengizyilmaz.net",
+          "external": true
+        }
+      ]
+    },
+    {
+      "title": "Social",
+      "links": [
+        {
+          "href": "https://x.com/cengizyilmaz_",
+          "label": "X",
+          "external": true
+        },
+        {
+          "href": "https://www.facebook.com/cengizyilmz1",
+          "label": "Facebook",
+          "external": true
+        },
+        {
+          "href": "https://www.reddit.com/user/Accomplished-Tip7450/",
+          "label": "Reddit",
+          "external": true
+        },
+        {
+          "href": "https://github.com/cengizyilmaz1/",
+          "label": "GitHub",
+          "external": true
+        },
+        {
+          "href": "https://www.youtube.com/@cengizyilmz",
+          "label": "YouTube",
+          "external": true
+        },
+        {
+          "href": "https://linkedin.com/in/cengizyilmazz",
+          "label": "LinkedIn",
+          "external": true
+        }
+      ]
+    }
+  ]
+}

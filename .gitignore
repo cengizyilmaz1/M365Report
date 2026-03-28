@@ -1,0 +1,16 @@
+node_modules
+dist
+.astro
+.bundle
+.jekyll-cache
+.jekyll-metadata
+.sass-cache
+coverage
+playwright-report
+test-results
+vendor
+_site
+blog/_data/site.json
+blog/_data/guides.json
+public/assets/brand-shell.css
+public/runtime-config.local.json

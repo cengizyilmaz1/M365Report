@@ -1,0 +1,56 @@
+---
+import { footerLinkGroups, siteConfig } from "@/lib/site";
+import { resolveHref, withBase } from "@/lib/paths";
+---
+
+<footer class="pt-6">
+  <div class="page-frame">
+    <div class="glass-panel rounded-[2rem] px-6 py-8 md:px-8">
+      <div class="grid gap-8 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
+        <div class="space-y-4">
+          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-ink-700">{siteConfig.name}</p>
+          <h2 class="max-w-md text-2xl font-semibold leading-tight text-ink-950">Modern Microsoft 365 reporting that stays elegant, auditable, and privacy-aware.</h2>
+          <p class="max-w-xl text-sm leading-7 text-ink-700">
+            The public site, delegated login flow, and Jekyll blog all share one visual language so the product feels trustworthy from first click to final export.
+          </p>
+          <div class="flex flex-wrap gap-3 pt-2">
+            <a
+              href={withBase(siteConfig.loginPath)}
+              class="rounded-full bg-ink-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-ink-800"
+            >
+              Open login
+            </a>
+            <a
+              href={`${siteConfig.siteUrl}${siteConfig.loginPath}`}
+              class="rounded-full border border-ink-900/10 bg-white/90 px-4 py-2.5 text-sm font-semibold text-ink-800 transition hover:-translate-y-0.5 hover:border-ink-900/25"
+            >
+              {`${siteConfig.domain}/login`}
+            </a>
+          </div>
+        </div>
+
+        {footerLinkGroups.map((group) => (
+          <div class="space-y-3">
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-ink-700">{group.title}</p>
+            <div class="flex flex-col gap-2 text-sm text-ink-700">
+              {group.links.map((item) => (
+                <a
+                  href={resolveHref(item)}
+                  class="transition hover:translate-x-0.5 hover:text-ink-950"
+                  target={item.external ? "_blank" : undefined}
+                  rel={item.external ? "noreferrer" : undefined}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-8 border-t border-ink-900/8 pt-5 text-xs uppercase tracking-[0.16em] text-ink-600">
+        <p>Read-only Microsoft Graph reporting. Browser-only data collection. Local-first exports.</p>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,27 @@
+{
+  "appName": "M365 Tenant Reporter",
+  "siteUrl": "https://m365report.cengizyilmaz.net",
+  "basePath": "/",
+  "authority": "https://login.microsoftonline.com/organizations",
+  "clientId": "REPLACE_WITH_ENTRA_CLIENT_ID",
+  "knownAuthorities": [],
+  "loginRedirectPath": "/login",
+  "postLogoutRedirectPath": "/",
+  "coreScopes": [
+    "openid",
+    "profile",
+    "email",
+    "User.Read",
+    "User.Read.All",
+    "GroupMember.Read.All",
+    "LicenseAssignment.Read.All",
+    "MailboxSettings.Read"
+  ],
+  "reportsScopes": [
+    "Reports.Read.All"
+  ],
+  "advancedAuditScopes": [
+    "AuditLog.Read.All"
+  ],
+  "allowAuditOptIn": true
+}

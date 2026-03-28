@@ -1,0 +1,42 @@
+{% assign site_data = site.data.site %}
+<header class="brand-topbar">
+  <div class="brand-frame brand-topbar-inner">
+    <div class="brand-topbar-row">
+      <a class="brand-wordmark" href="{{ site_data.siteConfig.siteUrl }}">
+        <span class="brand-mark">M</span>
+        <span>{{ site_data.siteConfig.name }}</span>
+      </a>
+
+      <nav class="brand-nav" aria-label="Primary">
+        {% for item in site_data.siteNavigation %}
+        <a href="{{ item.href }}">{{ item.label }}</a>
+        {% endfor %}
+      </nav>
+
+      <div class="brand-actions">
+        {% for item in site_data.headerActions %}
+        <a
+          href="{{ item.href }}"
+          class="brand-button {% if item.tone == 'primary' %}brand-button-primary{% else %}brand-button-secondary{% endif %}"
+        >
+          {{ item.label }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="brand-topbar-row">
+      <div class="brand-subnav" aria-label="Network">
+        {% for item in site_data.ecosystemLinks %}
+        <a href="{{ item.href }}" target="_blank" rel="noreferrer">{{ item.label }}</a>
+        {% endfor %}
+      </div>
+
+      <div class="brand-social" aria-label="Social">
+        {% for item in site_data.socialLinks %}
+        <a href="{{ item.href }}" target="_blank" rel="noreferrer">{{ item.label }}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,38 @@
+---
+layout: default
+---
+<section class="brand-section">
+  <div class="brand-frame brand-article">
+    <article class="brand-article-content">
+      <p class="brand-kicker">{{ page.category }}</p>
+      <h1 class="brand-section-title">{{ page.title }}</h1>
+      <p class="brand-lead">{{ page.description }}</p>
+      <div class="brand-chip-row">
+        <span class="brand-chip">{{ page.reading_time }}</span>
+        <span class="brand-chip">{{ page.date | date: "%Y-%m-%d" }}</span>
+      </div>
+      <div class="brand-section-copy">
+        {{ content }}
+      </div>
+    </article>
+
+    <aside class="brand-sidebar">
+      <section class="brand-card">
+        <p class="brand-kicker">Next action</p>
+        <h2>{{ page.cta_title | default: "Open the live login flow" }}</h2>
+        <p>{{ page.cta_body | default: "Use the dedicated /login route to start the delegated Microsoft Entra sign-in experience." }}</p>
+        <a class="brand-button brand-button-primary" href="/login">Open /login</a>
+      </section>
+
+      <section class="brand-card">
+        <p class="brand-kicker">Related guides</p>
+        <div class="brand-post-list">
+          {% assign related_posts = site.posts | where_exp: "post", "post.url != page.url" %}
+          {% for post in related_posts limit: 3 %}
+          {% include post-card.html post=post %}
+          {% endfor %}
+        </div>
+      </section>
+    </aside>
+  </div>
+</section>

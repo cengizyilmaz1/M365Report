@@ -1,0 +1,11 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import AppEntry from "@/features/app/AppEntry";
+---
+
+<AppLayout
+  title="App | M365 Tenant Reporter"
+  description="Authenticated Microsoft 365 reporting workspace."
+>
+  <AppEntry client:load />
+</AppLayout>
