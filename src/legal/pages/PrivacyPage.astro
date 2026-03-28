@@ -1,7 +1,5 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import PageHero from "@/components/site/PageHero.astro";
-import SectionBlock from "@/components/site/SectionBlock.astro";
 import { siteConfig } from "@/lib/site";
 
 const structuredData = {
@@ -9,83 +7,81 @@ const structuredData = {
   "@type": "WebPage",
   name: "Privacy | M365 Tenant Reporter",
   url: `${siteConfig.siteUrl}${siteConfig.privacyPath}`,
-  description: "Review how M365 Tenant Reporter handles delegated sign-in, browser-only report generation, and session-based tenant data."
+  description: "Zero-storage privacy model. Browser-only data collection."
 };
 ---
 
 <BaseLayout
   title="Privacy | M365 Tenant Reporter"
-  description="Review how M365 Tenant Reporter handles delegated sign-in, browser-only report generation, and session-based tenant data."
-  keywords={[
-    "m365 privacy policy",
-    "browser-only microsoft graph reporting",
-    "zero-storage privacy model",
-    "microsoft 365 data handling"
-  ]}
+  description="M365 Tenant Reporter does not store tenant data. All collection happens in the browser and stays in the current session."
+  keywords={["m365 privacy", "zero-storage reporting", "browser-only data collection"]}
   structuredData={structuredData}
 >
-  <PageHero
-    eyebrow="Privacy"
-    title="The product is designed to avoid storing tenant report data."
-    body="Microsoft Graph collection happens in the browser after delegated sign-in. Report data lives in memory for the current session and exported files stay under the user's control."
-  />
-
-  <SectionBlock title="What is kept during the session">
-    <div class="grid gap-4 md:grid-cols-2">
-      <article class="fine-border card-hover rounded-2xl bg-white p-6">
-        <div class="icon-container bg-sky-500/10 text-sky-500 mb-4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <section class="section-space">
+    <div class="page-frame max-w-3xl">
+      <div class="glass-panel rounded-3xl p-8 md:p-12 animate-fade-up">
+        <span class="badge badge-mint mb-6">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
-        </div>
-        <h3 class="text-base font-bold text-ink-950">Authentication state</h3>
-        <p class="mt-2 text-sm leading-7 text-ink-600">MSAL stores only the session data needed to maintain the delegated login flow in sessionStorage.</p>
-      </article>
-      <article class="fine-border card-hover rounded-2xl bg-white p-6">
-        <div class="icon-container bg-mint-500/10 text-mint-500 mb-4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-          </svg>
-        </div>
-        <h3 class="text-base font-bold text-ink-950">Public runtime configuration</h3>
-        <p class="mt-2 text-sm leading-7 text-ink-600">The static site ships public client configuration and route settings, but no tenant report content or backend secret material.</p>
-      </article>
-    </div>
-  </SectionBlock>
+          Privacy
+        </span>
 
-  <SectionBlock title="What the product does not keep">
-    <div class="grid gap-4 md:grid-cols-2">
-      <article class="fine-border card-hover rounded-2xl bg-white p-6">
-        <div class="icon-container bg-rose-400/10 text-rose-400 mb-4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
-            <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
-            <line x1="6" y1="6" x2="6.01" y2="6" />
-            <line x1="6" y1="18" x2="6.01" y2="18" />
-          </svg>
-        </div>
-        <h3 class="text-base font-bold text-ink-950">No server-side tenant warehouse</h3>
-        <p class="mt-2 text-sm leading-7 text-ink-600">Users, groups, licenses, mailboxes, and activity rows are not copied to a backend database by the product.</p>
-      </article>
-      <article class="fine-border card-hover rounded-2xl bg-white p-6">
-        <div class="icon-container bg-amber-500/10 text-amber-500 mb-4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6" />
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-          </svg>
-        </div>
-        <h3 class="text-base font-bold text-ink-950">No persistent browser cache for reports</h3>
-        <p class="mt-2 text-sm leading-7 text-ink-600">The reporting snapshot is not persisted to localStorage or IndexedDB. Clearing the session removes the in-memory state.</p>
-      </article>
-    </div>
-  </SectionBlock>
+        <h1 class="text-3xl font-bold tracking-tight text-ink-950 md:text-4xl" style="font-family: var(--font-display);">
+          Your tenant data never leaves the browser.
+        </h1>
 
-  <SectionBlock title="What happens to downloads">
-    <div class="space-y-4 text-base leading-8 text-ink-600">
-      <p>Exports are generated locally in the browser and downloaded to the operator's device. The site does not upload those generated report files back to a product backend.</p>
-      <p>If you want to remove report data from the running session, use the clear session action, refresh the page, sign out, or close the tab.</p>
+        <div class="mt-8 space-y-6">
+          <div class="flex items-start gap-4">
+            <div class="icon-container bg-mint-500/10 text-mint-500 shrink-0 mt-1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-ink-950">Browser-only collection</h2>
+              <p class="mt-1 text-sm leading-7 text-ink-600">Microsoft Graph data is fetched directly from your browser after delegated sign-in. No proxy, no backend.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="icon-container bg-mint-500/10 text-mint-500 shrink-0 mt-1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-ink-950">Session-only storage</h2>
+              <p class="mt-1 text-sm leading-7 text-ink-600">Report data lives in memory. Close the tab, refresh, or sign out to remove everything.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="icon-container bg-mint-500/10 text-mint-500 shrink-0 mt-1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-ink-950">Local exports</h2>
+              <p class="mt-1 text-sm leading-7 text-ink-600">CSV, JSON, Excel, and HTML files are generated locally and downloaded to your device. Nothing is uploaded back.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="icon-container bg-mint-500/10 text-mint-500 shrink-0 mt-1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base font-bold text-ink-950">No server-side database</h2>
+              <p class="mt-1 text-sm leading-7 text-ink-600">Users, groups, licenses, and activity rows are not stored in any backend database.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </SectionBlock>
+  </section>
 </BaseLayout>

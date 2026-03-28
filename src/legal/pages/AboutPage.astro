@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import PageHero from "@/components/site/PageHero.astro";
-import SectionBlock from "@/components/site/SectionBlock.astro";
+import { withBase } from "@/lib/paths";
 import { siteConfig } from "@/lib/site";
 
 const structuredData = {
@@ -9,68 +8,76 @@ const structuredData = {
   "@type": "AboutPage",
   name: "About | M365 Tenant Reporter",
   url: `${siteConfig.siteUrl}${siteConfig.aboutPath}`,
-  description: "Learn what M365 Tenant Reporter does, who it is for, and why it keeps Microsoft 365 reporting read-only and session-based."
+  description: "Read-only Microsoft 365 tenant reporting. Browser-only. Zero storage."
 };
 ---
 
 <BaseLayout
   title="About | M365 Tenant Reporter"
-  description="Learn what M365 Tenant Reporter does, who it is for, and why it keeps Microsoft 365 reporting read-only and session-based."
-  keywords={[
-    "about m365 tenant reporter",
-    "microsoft 365 reporting architecture",
-    "zero-storage reporting product",
-    "microsoft graph reporting tool"
-  ]}
+  description="M365 Tenant Reporter is a read-only Microsoft 365 reporting tool with browser-only data collection and local exports."
+  keywords={["about m365 tenant reporter", "microsoft 365 reporting", "zero-storage reporting"]}
   structuredData={structuredData}
 >
-  <PageHero
-    eyebrow="About"
-    title="A focused reporting product for Microsoft 365 teams."
-    body="M365 Tenant Reporter is built for visibility, not remediation. Sign in, collect a report snapshot, review the data, and export what you need."
-  />
+  <section class="section-space">
+    <div class="page-frame max-w-3xl">
+      <div class="glass-panel rounded-3xl p-8 md:p-12 animate-fade-up">
+        <span class="badge badge-sky mb-6">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          About
+        </span>
 
-  <SectionBlock title="What the product does">
-    <div class="grid gap-4 md:grid-cols-3">
-      <article class="fine-border card-hover rounded-2xl bg-white p-6">
-        <div class="icon-container bg-sky-500/10 text-sky-500 mb-4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-          </svg>
-        </div>
-        <h3 class="text-base font-bold text-ink-950">Inventory reporting</h3>
-        <p class="mt-2 text-sm leading-7 text-ink-600">Review total users, licensed users, unlicensed users, groups, mailbox purpose, and license capacity.</p>
-      </article>
-      <article class="fine-border card-hover rounded-2xl bg-white p-6">
-        <div class="icon-container bg-mint-500/10 text-mint-500 mb-4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-        </div>
-        <h3 class="text-base font-bold text-ink-950">Local exports</h3>
-        <p class="mt-2 text-sm leading-7 text-ink-600">Download report outputs as CSV, JSON, Excel, or HTML directly from the browser.</p>
-      </article>
-      <article class="fine-border card-hover rounded-2xl bg-white p-6">
-        <div class="icon-container bg-violet-500/10 text-violet-500 mb-4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
-        </div>
-        <h3 class="text-base font-bold text-ink-950">Read-only safety</h3>
-        <p class="mt-2 text-sm leading-7 text-ink-600">The app does not assign licenses, change tenant settings, or run remediation actions.</p>
-      </article>
-    </div>
-  </SectionBlock>
+        <h1 class="text-3xl font-bold tracking-tight text-ink-950 md:text-4xl" style="font-family: var(--font-display);">
+          Read-only reporting for Microsoft 365.
+        </h1>
 
-  <SectionBlock title="How the product is meant to be used">
-    <div class="space-y-4 text-base leading-8 text-ink-600">
-      <p>The main user flow is simple: open <strong class="text-ink-800">{`${siteConfig.domain}/login`}</strong>, complete Microsoft Entra sign-in, generate a fresh report snapshot, then export what you need.</p>
-      <p>The public site and blog explain the product, but the operational experience is centered around that single login route so it stays clear for admins and end users.</p>
+        <div class="mt-6 space-y-4 text-base leading-8 text-ink-600">
+          <p>
+            M365 Tenant Reporter collects users, licenses, groups, mailbox data, and activity reports from Microsoft Graph — entirely in the browser. No data is stored on any server.
+          </p>
+          <p>
+            Export to CSV, JSON, Excel, or HTML. Reports stay in your browser session and disappear when you close the tab.
+          </p>
+        </div>
+
+        <div class="divider my-8"></div>
+
+        <div class="grid gap-4 sm:grid-cols-3">
+          <div class="text-center">
+            <p class="text-2xl font-bold text-ink-950">6</p>
+            <p class="mt-1 text-sm text-ink-600">Report modules</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-ink-950">4</p>
+            <p class="mt-1 text-sm text-ink-600">Export formats</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-ink-950">0</p>
+            <p class="mt-1 text-sm text-ink-600">Server storage</p>
+          </div>
+        </div>
+
+        <div class="divider my-8"></div>
+
+        <div class="flex flex-wrap gap-3">
+          <a href={withBase("/app")} class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            Open app
+          </a>
+          <a href={withBase("/blog")} class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </svg>
+            Read guides
+          </a>
+        </div>
+      </div>
     </div>
-  </SectionBlock>
+  </section>
 </BaseLayout>

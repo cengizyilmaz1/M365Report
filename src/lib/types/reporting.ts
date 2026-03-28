@@ -39,6 +39,7 @@ export interface UserReportRow {
 export interface LicenseReportRow {
   skuId: string;
   skuPartNumber: string;
+  friendlyName: string;
   capabilityStatus: string;
   total: number;
   consumed: number;

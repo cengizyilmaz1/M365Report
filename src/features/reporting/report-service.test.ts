@@ -109,7 +109,7 @@ describe("collectTenantReportSnapshot", () => {
     expect(snapshot.overview.totalPurchasedLicenses).toBe(10);
     expect(snapshot.overview.consumedLicenses).toBe(4);
     expect(snapshot.overview.availableLicenses).toBe(6);
-    expect(snapshot.users[0]?.assignedSkuNames).toContain("ENTERPRISEPACK");
+    expect(snapshot.users[0]?.assignedSkuNames).toContain("Office 365 E3");
     expect(snapshot.activity.every((dataset) => dataset.status === "unavailable")).toBe(true);
     expect(snapshot.notes.some((note) => note.includes("service principal members"))).toBe(true);
     expect(snapshot.notes.some((note) => note.includes("mailboxSettings.userPurpose"))).toBe(true);

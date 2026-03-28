@@ -12,14 +12,13 @@ test("app route is marked noindex", async ({ page }) => {
   await page.goto("/app");
 
   await expect(page.locator("meta[name='robots']")).toHaveAttribute("content", /noindex/);
-  await expect(page.getByText(/The reporting flow now starts at \/login/i)).toBeVisible();
 });
 
 test("blog routes render discoverable guidance content", async ({ page }) => {
   await page.goto("/blog");
 
-  await expect(page).toHaveTitle(/M365 Tenant Reporter Blog/);
-  await expect(page.getByRole("heading", { name: /Product guides that stay visually aligned/i })).toBeVisible();
+  await expect(page).toHaveTitle(/Blog \| M365 Tenant Reporter/);
+  await expect(page.getByRole("heading", { name: /Learn how each report module works/i })).toBeVisible();
 
   await page.getByRole("link", { name: /How to track total users in M365 Tenant Reporter/i }).click();
 
@@ -31,9 +30,9 @@ test("blog routes render discoverable guidance content", async ({ page }) => {
 test("static about and privacy pages render from dedicated routes", async ({ page }) => {
   await page.goto("/about");
   await expect(page).toHaveTitle(/About \| M365 Tenant Reporter/);
-  await expect(page.getByRole("heading", { name: /A focused reporting product for Microsoft 365 teams/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Read-only reporting for Microsoft 365/i })).toBeVisible();
 
   await page.goto("/privacy");
   await expect(page).toHaveTitle(/Privacy \| M365 Tenant Reporter/);
-  await expect(page.getByRole("heading", { name: /The product is designed to avoid storing tenant report data/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Your tenant data never leaves the browser/i })).toBeVisible();
 });

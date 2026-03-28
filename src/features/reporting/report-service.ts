@@ -1,5 +1,6 @@
 import { GraphApiError, GraphClient } from "@/lib/graph/client";
 import { parseCsv } from "@/lib/graph/csv";
+import { resolveSkuFriendlyName } from "@/lib/graph/sku-names";
 import type { GraphGroup, GraphSubscribedSku, GraphUser } from "@/lib/graph/types";
 import type {
   ActivityDataset,
@@ -66,7 +67,7 @@ export async function collectTenantReportSnapshot(
     collectLastSignInIndex(graph, permissionProfile)
   ]);
 
-  const skuNameById = new Map(subscribedSkus.map((sku) => [sku.skuId.toLowerCase(), sku.skuPartNumber]));
+  const skuNameById = new Map(subscribedSkus.map((sku) => [sku.skuId.toLowerCase(), resolveSkuFriendlyName(sku.skuPartNumber)]));
   const licenseRows = buildLicenseRows(subscribedSkus);
   const userRows = buildUserRows(users, skuNameById, signInCollection.index);
   const groupRows = await buildGroupRows(graph, groups, notes);
@@ -122,6 +123,7 @@ function buildLicenseRows(skus: GraphSubscribedSku[]): LicenseReportRow[] {
       return {
         skuId: sku.skuId,
         skuPartNumber: sku.skuPartNumber,
+        friendlyName: resolveSkuFriendlyName(sku.skuPartNumber),
         capabilityStatus: sku.capabilityStatus ?? "Enabled",
         total,
         consumed: sku.consumedUnits,

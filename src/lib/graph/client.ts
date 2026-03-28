@@ -1,6 +1,8 @@
 import type { GraphCollectionResponse } from "./types";
 
 const GRAPH_ROOT = "https://graph.microsoft.com/v1.0";
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 1000;
 
 export class GraphApiError extends Error {
   status: number;
@@ -81,20 +83,36 @@ export class GraphClient {
   ) {
     const token = await this.#getAccessToken(group);
     const url = this.resolveUrl(path);
-    const response = await fetch(url, {
-      ...init,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        ...(init?.headers ?? {})
-      }
-    });
 
-    if (!response.ok) {
+    let lastError: GraphApiError | undefined;
+
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      if (attempt > 0 && lastError) {
+        const delay = getRetryDelay(lastError, attempt);
+        await sleep(delay);
+      }
+
+      const response = await fetch(url, {
+        ...init,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...(init?.headers ?? {})
+        }
+      });
+
+      if (response.ok) {
+        return response;
+      }
+
       const detail = await safeReadText(response);
-      throw new GraphApiError(`Graph request failed for ${url}`, response.status, detail);
+      lastError = new GraphApiError(`Graph request failed for ${url}`, response.status, detail);
+
+      if (!isRetryable(response.status)) {
+        throw lastError;
+      }
     }
 
-    return response;
+    throw lastError;
   }
 
   private resolveUrl(path: string) {
@@ -104,6 +122,30 @@ export class GraphClient {
 
     return `${GRAPH_ROOT}${path}`;
   }
+}
+
+function isRetryable(status: number) {
+  return status === 429 || status === 503 || status === 504;
+}
+
+function getRetryDelay(error: GraphApiError, attempt: number) {
+  const retryAfter = parseRetryAfterHeader(error.detail);
+  if (retryAfter > 0) {
+    return retryAfter * 1000;
+  }
+
+  return RETRY_DELAY_MS * Math.pow(2, attempt - 1);
+}
+
+function parseRetryAfterHeader(detail?: string) {
+  if (!detail) return 0;
+
+  const match = /Retry-After:\s*(\d+)/i.exec(detail);
+  return match ? Number.parseInt(match[1], 10) : 0;
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function safeReadText(response: Response) {

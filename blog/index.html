@@ -1,31 +1,26 @@
 ---
 layout: default
 title: Blog | M365 Tenant Reporter
-description: SEO-focused feature guides for licensed users, unlicensed users, total users, shared mailboxes, group member counts, license availability, and report exports.
+description: Product guides for Microsoft 365 reporting — users, licenses, groups, mailboxes, exports, permissions, and security.
 keywords:
   - m365 reporting blog
   - microsoft 365 reporting guides
-  - jekyll seo blog
+  - m365 tenant reporter documentation
 ---
 <section class="brand-section">
   <div class="brand-frame">
     <div class="brand-hero">
-      <p class="brand-kicker">Jekyll blog</p>
-      <h1 class="brand-title">Product guides that stay visually aligned with the main site.</h1>
+      <p class="brand-kicker">Guides</p>
+      <h1 class="brand-title">Learn how each report module works.</h1>
       <p class="brand-lead">
-        The blog is its own Jekyll application, but it shares the same design language, navigation model, and product narrative as the rest of m365report.cengizyilmaz.net.
+        Step-by-step guides for every reporting capability — from connecting your tenant to exporting results.
       </p>
     </div>
   </div>
 </section>
 
-<section class="brand-section">
+<section class="brand-section" style="padding-top: 0;">
   <div class="brand-frame">
-    <div class="brand-section-head">
-      <h2 class="brand-section-title">Feature-focused articles</h2>
-      <p class="brand-section-copy">Every article is written to explain how a reporting capability works, what operational question it answers, and when the export is useful.</p>
-    </div>
-
     <div class="brand-post-list">
       {% for post in site.posts %}
       {% include post-card.html post=post %}

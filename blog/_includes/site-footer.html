@@ -3,8 +3,10 @@
   <div class="brand-frame brand-footer-grid">
     <div>
       <p class="brand-footer-title">{{ site_data.siteConfig.name }}</p>
-      <p class="brand-section-copy">Jekyll-powered product documentation and SEO content for the same zero-storage Microsoft 365 reporting platform.</p>
-      <p class="brand-section-copy">Primary login URL: <a href="{{ site_data.siteConfig.loginPath }}">{{ site_data.siteConfig.domain }}/login</a></p>
+      <p class="brand-section-copy">Read-only Microsoft 365 reporting. Browser-only data collection with local exports.</p>
+      <div style="margin-top: 1rem;">
+        <a class="brand-button brand-button-primary" href="/app" style="font-size: 0.8rem; padding: 0.5rem 1rem;">Open app</a>
+      </div>
     </div>
 
     {% for group in site_data.footerLinkGroups %}
