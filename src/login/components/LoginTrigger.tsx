@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { loadRuntimeConfig } from "@/lib/config/runtime-config";
+import { withBase } from "@/lib/paths";
 import {
   createPublicClient,
   handleRedirect,
@@ -12,6 +13,40 @@ type Status = "idle" | "loading" | "redirecting" | "error";
 export default function LoginTrigger() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    void (async () => {
+      try {
+        const config = await loadRuntimeConfig();
+
+        if (isPlaceholderConfig(config)) {
+          return;
+        }
+
+        const instance = await createPublicClient(config);
+        const { account } = await handleRedirect(instance);
+
+        if (!isMounted || !account) {
+          return;
+        }
+
+        setStatus("redirecting");
+        window.location.replace(withBase("/app"));
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setStatus("idle");
+      }
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const startLogin = async () => {
     setStatus("loading");
@@ -31,7 +66,7 @@ export default function LoginTrigger() {
 
       // Already authenticated — redirect to app
       if (account) {
-        window.location.href = config.redirectUri;
+        window.location.replace(withBase("/app"));
         return;
       }
 
