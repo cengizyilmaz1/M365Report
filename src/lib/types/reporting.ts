@@ -102,7 +102,7 @@ export interface TenantReportSnapshot {
   mailboxes: MailboxReportRow[];
   activity: ActivityDataset[];
   lastSignInSummary?: LastSignInSummary;
-  warnings: string[];
+  notes: string[];
 }
 
 export interface ExportArtifact {

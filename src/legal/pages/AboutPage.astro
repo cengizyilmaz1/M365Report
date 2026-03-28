@@ -14,7 +14,7 @@ const structuredData = {
 
 <BaseLayout
   title="About | M365 Tenant Reporter"
-  description="Learn how M365 Tenant Reporter is structured as a production-grade Microsoft 365 reporting product with a zero-storage model."
+  description="Learn what M365 Tenant Reporter does, who it is for, and why it keeps Microsoft 365 reporting read-only and session-based."
   keywords={[
     "about m365 tenant reporter",
     "microsoft 365 reporting architecture",
@@ -24,31 +24,31 @@ const structuredData = {
 >
   <PageHero
     eyebrow="About"
-    title="A focused reporting product for Microsoft 365 teams who want visibility without remediation risk."
-    body="M365 Tenant Reporter is designed to be read-only, browser-first, and structurally disciplined. The product site, login surface, legal pages, and Jekyll blog are separated so the project can scale without collapsing into one folder."
+    title="A focused reporting product for Microsoft 365 teams."
+    body="M365 Tenant Reporter is built for visibility, not remediation. Sign in, collect a report snapshot, review the data, and export what you need."
   />
 
-  <SectionBlock title="Product principles">
+  <SectionBlock title="What the product does">
     <div class="grid gap-4 md:grid-cols-3">
       <article class="fine-border rounded-[1.5rem] bg-white p-6">
-        <h3 class="text-lg font-semibold text-ink-950">Read-only by design</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">The app does not assign licenses, change tenant settings, or perform remediation. It reports and exports only.</p>
+        <h3 class="text-lg font-semibold text-ink-950">Inventory reporting</h3>
+        <p class="mt-3 text-sm leading-7 text-ink-700">Review total users, licensed users, unlicensed users, groups, mailbox purpose, and license capacity.</p>
       </article>
       <article class="fine-border rounded-[1.5rem] bg-white p-6">
-        <h3 class="text-lg font-semibold text-ink-950">Zero-storage mindset</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">Tenant report data is collected in the browser and discarded after the active session rather than written to a server-side system.</p>
+        <h3 class="text-lg font-semibold text-ink-950">Local exports</h3>
+        <p class="mt-3 text-sm leading-7 text-ink-700">Download report outputs as CSV, JSON, Excel, or HTML directly from the browser.</p>
       </article>
       <article class="fine-border rounded-[1.5rem] bg-white p-6">
-        <h3 class="text-lg font-semibold text-ink-950">Open-source maintainability</h3>
-        <p class="mt-3 text-sm leading-7 text-ink-700">The repo structure is meant to stay understandable as new modules, docs, and integrations are added.</p>
+        <h3 class="text-lg font-semibold text-ink-950">Read-only safety</h3>
+        <p class="mt-3 text-sm leading-7 text-ink-700">The app does not assign licenses, change tenant settings, or run remediation actions.</p>
       </article>
     </div>
   </SectionBlock>
 
-  <SectionBlock title="Maintainer context">
+  <SectionBlock title="How the product is meant to be used">
     <div class="space-y-4 text-base leading-8 text-ink-700">
-      <p>The product is part of a broader Microsoft 365-focused tooling network maintained under the Cengiz Yilmaz domain ecosystem.</p>
-      <p>That is why the public site links cleanly to related utilities, while the core reporting experience stays concentrated around the single hostname <strong>{siteConfig.domain}</strong>.</p>
+      <p>The main user flow is simple: open <strong>{`${siteConfig.domain}/login`}</strong>, complete Microsoft Entra sign-in, generate a fresh report snapshot, then export what you need.</p>
+      <p>The public site and blog explain the product, but the operational experience is centered around that single login route so it stays clear for admins and end users.</p>
     </div>
   </SectionBlock>
 </BaseLayout>

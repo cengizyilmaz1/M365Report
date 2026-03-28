@@ -42,14 +42,20 @@ const activityWorkloads: Array<{
   }
 ];
 
+interface SignInCollectionResult {
+  index: Map<string, string | null>;
+  available: boolean;
+  note?: string;
+}
+
 export async function collectTenantReportSnapshot(
   acquireGraphToken: (group: "core" | "reports" | "advancedAudit") => Promise<string>,
   permissionProfile: PermissionProfile
 ): Promise<TenantReportSnapshot> {
   const graph = new GraphClient(acquireGraphToken);
-  const warnings: string[] = [];
+  const notes: string[] = [];
 
-  const [users, subscribedSkus, groups, signInIndex] = await Promise.all([
+  const [users, subscribedSkus, groups, signInCollection] = await Promise.all([
     graph.getAllPages<GraphUser>(
       "/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,assignedLicenses&$top=999"
     ),
@@ -57,16 +63,16 @@ export async function collectTenantReportSnapshot(
     graph.getAllPages<GraphGroup>(
       "/groups?$select=id,displayName,mailEnabled,securityEnabled,groupTypes&$top=999"
     ),
-    collectLastSignInIndex(graph, permissionProfile, warnings)
+    collectLastSignInIndex(graph, permissionProfile)
   ]);
 
   const skuNameById = new Map(subscribedSkus.map((sku) => [sku.skuId.toLowerCase(), sku.skuPartNumber]));
   const licenseRows = buildLicenseRows(subscribedSkus);
-  const userRows = buildUserRows(users, skuNameById, signInIndex);
-  const groupRows = await buildGroupRows(graph, groups, warnings);
-  const mailboxRows = await buildMailboxRows(graph, users, warnings);
+  const userRows = buildUserRows(users, skuNameById, signInCollection.index);
+  const groupRows = await buildGroupRows(graph, groups, notes);
+  const mailboxRows = await buildMailboxRows(graph, users, notes);
   const overview = buildOverview(userRows, licenseRows, groupRows, mailboxRows);
-  const activity = await buildActivityDatasets(graph, permissionProfile, warnings);
+  const activity = await buildActivityDatasets(graph, permissionProfile);
 
   return {
     overview,
@@ -75,8 +81,8 @@ export async function collectTenantReportSnapshot(
     groups: groupRows,
     mailboxes: mailboxRows,
     activity,
-    lastSignInSummary: buildLastSignInSummary(signInIndex, permissionProfile),
-    warnings
+    lastSignInSummary: buildLastSignInSummary(signInCollection, permissionProfile),
+    notes
   };
 }
 
@@ -125,7 +131,7 @@ function buildLicenseRows(skus: GraphSubscribedSku[]): LicenseReportRow[] {
     .sort((left, right) => left.skuPartNumber.localeCompare(right.skuPartNumber));
 }
 
-async function buildGroupRows(graph: GraphClient, groups: GraphGroup[], warnings: string[]) {
+async function buildGroupRows(graph: GraphClient, groups: GraphGroup[], notes: string[]) {
   let usedFallback = false;
 
   const rows = await mapWithConcurrency(groups, 6, async (group) => {
@@ -146,7 +152,7 @@ async function buildGroupRows(graph: GraphClient, groups: GraphGroup[], warnings
       memberCount = expanded.members?.length ?? 0;
 
       if (error instanceof GraphApiError && error.status >= 500) {
-        warnings.push(`Group member count fallback used for ${group.displayName ?? group.id}.`);
+        notes.push(`Group member count fallback was used for ${group.displayName ?? group.id}.`);
       }
     }
 
@@ -161,16 +167,18 @@ async function buildGroupRows(graph: GraphClient, groups: GraphGroup[], warnings
   });
 
   if (usedFallback) {
-    warnings.push(
-      "Direct group member counts fall back to expanded members when the count endpoint fails. Microsoft documents a known v1.0 caveat around service principal members."
+    notes.push(
+      "Some group counts used the expanded-members fallback. Microsoft documents a known v1.0 caveat around service principal members."
     );
   }
 
   return rows.sort((left, right) => left.groupName.localeCompare(right.groupName));
 }
 
-async function buildMailboxRows(graph: GraphClient, users: GraphUser[], warnings: string[]) {
-  const rows = await mapWithConcurrency(users, 6, async (user) => {
+async function buildMailboxRows(graph: GraphClient, users: GraphUser[], notes: string[]) {
+  const mailboxCandidates = users.filter((user) => Boolean(user.mail?.trim()));
+
+  const rows = await mapWithConcurrency(mailboxCandidates, 6, async (user) => {
     try {
       const response = await graph.getJson<{ userPurpose?: string | null }>(
         `/users/${user.id}/mailboxSettings?$select=userPurpose`
@@ -205,8 +213,8 @@ async function buildMailboxRows(graph: GraphClient, users: GraphUser[], warnings
   const unknownCount = rows.filter((row) => row.purpose === "unknown").length;
 
   if (unknownCount > 0) {
-    warnings.push(
-      `${unknownCount} accounts did not expose mailboxSettings.userPurpose and are marked as unknown.`
+    notes.push(
+      `${unknownCount} mail-enabled accounts did not expose mailboxSettings.userPurpose and are marked as unknown.`
     );
   }
 
@@ -240,8 +248,7 @@ function buildOverview(
 
 async function buildActivityDatasets(
   graph: GraphClient,
-  permissionProfile: PermissionProfile,
-  warnings: string[]
+  permissionProfile: PermissionProfile
 ): Promise<ActivityDataset[]> {
   if (!permissionProfile.reports.granted) {
     return activityWorkloads.map((dataset) => ({
@@ -266,24 +273,12 @@ async function buildActivityDatasets(
           status: "available"
         } satisfies ActivityDataset;
       } catch (error) {
-        if (error instanceof GraphApiError && error.status === 403) {
-          return {
-            workload: dataset.workload,
-            title: dataset.title,
-            rows: [],
-            status: "unavailable",
-            note: "The account needs Reports.Read.All and a supported Microsoft Entra reports role."
-          } satisfies ActivityDataset;
-        }
-
-        warnings.push(`Activity report failed for ${dataset.title}.`);
-
         return {
           workload: dataset.workload,
           title: dataset.title,
           rows: [],
-          status: "error",
-          note: error instanceof Error ? error.message : "The workload report could not be collected."
+          status: "unavailable",
+          note: buildActivityUnavailableNote(error)
         } satisfies ActivityDataset;
       }
     })
@@ -294,13 +289,16 @@ async function buildActivityDatasets(
 
 async function collectLastSignInIndex(
   graph: GraphClient,
-  permissionProfile: PermissionProfile,
-  warnings: string[]
-) {
+  permissionProfile: PermissionProfile
+): Promise<SignInCollectionResult> {
   const index = new Map<string, string | null>();
 
   if (!permissionProfile.advancedAudit.granted) {
-    return index;
+    return {
+      index,
+      available: false,
+      note: "Enable AuditLog.Read.All to collect last sign-in summaries."
+    };
   }
 
   try {
@@ -315,15 +313,22 @@ async function collectLastSignInIndex(
         user.signInActivity?.lastSuccessfulSignInDateTime ?? user.signInActivity?.lastSignInDateTime ?? null
       );
     });
-  } catch {
-    warnings.push("Last sign-in summary is unavailable for this tenant or role.");
-  }
 
-  return index;
+    return {
+      index,
+      available: true
+    };
+  } catch {
+    return {
+      index,
+      available: false,
+      note: "Last sign-in summary is unavailable for this tenant, license, or role."
+    };
+  }
 }
 
 function buildLastSignInSummary(
-  signInIndex: Map<string, string | null>,
+  signInCollection: SignInCollectionResult,
   permissionProfile: PermissionProfile
 ) {
   if (!permissionProfile.advancedAudit.granted) {
@@ -335,9 +340,18 @@ function buildLastSignInSummary(
     } as const;
   }
 
+  if (!signInCollection.available) {
+    return {
+      status: "unavailable",
+      totalWithRecordedSignIn: 0,
+      signedInLast30Days: 0,
+      note: signInCollection.note ?? "Last sign-in summary is unavailable for this tenant, license, or role."
+    } as const;
+  }
+
   const now = Date.now();
   const thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
-  const values = Array.from(signInIndex.values()).filter(Boolean) as string[];
+  const values = Array.from(signInCollection.index.values()).filter(Boolean) as string[];
 
   return {
     status: "available",
@@ -410,4 +424,20 @@ function normalizeScalar(value: string) {
   }
 
   return trimmed;
+}
+
+function buildActivityUnavailableNote(error: unknown) {
+  if (error instanceof GraphApiError) {
+    if ([401, 403].includes(error.status)) {
+      return "This workload needs Reports.Read.All and a supported Microsoft Entra reports role.";
+    }
+
+    if (error.status === 404) {
+      return "This workload report is not available for the current tenant or subscription.";
+    }
+
+    return "Microsoft Graph did not return a usable workload export for this browser session.";
+  }
+
+  return "This browser-only deployment could not read the redirected workload CSV from Microsoft Graph.";
 }

@@ -8,21 +8,14 @@ const { title, description } = Astro.props;
 ---
 
 <section class="section-space pt-4">
-  <div class="page-frame">
-    <div class="glass-panel rounded-[2rem] px-6 py-8 md:px-8 md:py-9">
-      <div class="grid gap-6 xl:grid-cols-[0.72fr_1.28fr] xl:items-start">
-        <div class="space-y-4">
-          <div class="inline-flex rounded-full border border-sky-500/15 bg-sky-500/8 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-500">
-            Section
-          </div>
-          <h2 class="text-balance text-2xl font-semibold text-ink-950 md:text-3xl">{title}</h2>
-          {description && <p class="text-base leading-8 text-ink-700">{description}</p>}
-        </div>
+  <div class="page-frame space-y-5">
+    <div class="max-w-3xl space-y-3">
+      <h2 class="text-balance text-2xl font-semibold text-ink-950 md:text-3xl">{title}</h2>
+      {description && <p class="text-base leading-8 text-ink-700">{description}</p>}
+    </div>
 
-        <div class="rounded-[1.7rem] border border-ink-900/6 bg-white/80 p-5 md:p-6">
-          <slot />
-        </div>
-      </div>
+    <div class="glass-panel rounded-[2rem] px-6 py-7 md:px-8 md:py-8">
+      <slot />
     </div>
   </div>
 </section>

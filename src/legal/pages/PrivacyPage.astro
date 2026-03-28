@@ -14,7 +14,7 @@ const structuredData = {
 
 <BaseLayout
   title="Privacy | M365 Tenant Reporter"
-  description="Review how M365 Tenant Reporter handles delegated sign-in, browser-only report generation, and zero-storage exports."
+  description="Review how M365 Tenant Reporter handles delegated sign-in, browser-only report generation, and session-based tenant data."
   keywords={[
     "m365 privacy policy",
     "browser-only microsoft graph reporting",
@@ -24,11 +24,11 @@ const structuredData = {
 >
   <PageHero
     eyebrow="Privacy"
-    title="The application is built to minimize retained tenant data."
-    body="Microsoft Graph collection happens in the browser after delegated sign-in. The runtime keeps report data in memory for the active session and the user controls any exported files."
+    title="The product is designed to avoid storing tenant report data."
+    body="Microsoft Graph collection happens in the browser after delegated sign-in. Report data lives in memory for the current session and exported files stay under the user's control."
   />
 
-  <SectionBlock title="What is stored">
+  <SectionBlock title="What is kept during the session">
     <div class="grid gap-4 md:grid-cols-2">
       <article class="fine-border rounded-[1.5rem] bg-white p-6">
         <h3 class="text-lg font-semibold text-ink-950">Authentication state</h3>
@@ -41,7 +41,7 @@ const structuredData = {
     </div>
   </SectionBlock>
 
-  <SectionBlock title="What is not stored">
+  <SectionBlock title="What the product does not keep">
     <div class="grid gap-4 md:grid-cols-2">
       <article class="fine-border rounded-[1.5rem] bg-white p-6">
         <h3 class="text-lg font-semibold text-ink-950">No server-side tenant warehouse</h3>
@@ -51,6 +51,13 @@ const structuredData = {
         <h3 class="text-lg font-semibold text-ink-950">No persistent browser cache for reports</h3>
         <p class="mt-3 text-sm leading-7 text-ink-700">The reporting snapshot is not persisted to localStorage or IndexedDB. Clearing the session removes the in-memory state.</p>
       </article>
+    </div>
+  </SectionBlock>
+
+  <SectionBlock title="What happens to downloads">
+    <div class="space-y-4 text-base leading-8 text-ink-700">
+      <p>Exports are generated locally in the browser and downloaded to the operator's device. The site does not upload those generated report files back to a product backend.</p>
+      <p>If you want to remove report data from the running session, use the clear session action, refresh the page, sign out, or close the tab.</p>
     </div>
   </SectionBlock>
 </BaseLayout>

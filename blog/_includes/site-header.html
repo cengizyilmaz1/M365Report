@@ -24,19 +24,5 @@
         {% endfor %}
       </div>
     </div>
-
-    <div class="brand-topbar-row">
-      <div class="brand-subnav" aria-label="Network">
-        {% for item in site_data.ecosystemLinks %}
-        <a href="{{ item.href }}" target="_blank" rel="noreferrer">{{ item.label }}</a>
-        {% endfor %}
-      </div>
-
-      <div class="brand-social" aria-label="Social">
-        {% for item in site_data.socialLinks %}
-        <a href="{{ item.href }}" target="_blank" rel="noreferrer">{{ item.label }}</a>
-        {% endfor %}
-      </div>
-    </div>
   </div>
 </header>

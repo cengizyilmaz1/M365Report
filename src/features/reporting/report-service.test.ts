@@ -111,8 +111,8 @@ describe("collectTenantReportSnapshot", () => {
     expect(snapshot.overview.availableLicenses).toBe(6);
     expect(snapshot.users[0]?.assignedSkuNames).toContain("ENTERPRISEPACK");
     expect(snapshot.activity.every((dataset) => dataset.status === "unavailable")).toBe(true);
-    expect(snapshot.warnings.some((warning) => warning.includes("service principal members"))).toBe(true);
-    expect(snapshot.warnings.some((warning) => warning.includes("mailboxSettings.userPurpose"))).toBe(true);
+    expect(snapshot.notes.some((note) => note.includes("service principal members"))).toBe(true);
+    expect(snapshot.notes.some((note) => note.includes("mailboxSettings.userPurpose"))).toBe(true);
   });
 });
 

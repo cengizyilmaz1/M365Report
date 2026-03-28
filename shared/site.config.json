@@ -5,14 +5,14 @@
     "domain": "m365report.cengizyilmaz.net",
     "siteUrl": "https://m365report.cengizyilmaz.net",
     "loginPath": "/login",
-    "appPath": "/app",
+    "appPath": "/login",
     "blogPath": "/blog",
     "docsPath": "/docs/getting-started",
     "aboutPath": "/about",
     "privacyPath": "/privacy",
     "authorName": "Cengiz Yilmaz",
     "authorUrl": "https://cengizyilmaz.net",
-    "defaultDescription": "Zero-storage Microsoft 365 reporting with browser-only Microsoft Graph collection, downloadable exports, and a Jekyll-powered SEO blog.",
+    "defaultDescription": "Read-only Microsoft 365 tenant reporting with browser-only Microsoft Graph collection, clean exports, and a focused SaaS experience.",
     "defaultKeywords": [
       "Microsoft 365 reporting",
       "M365 tenant report",
@@ -28,18 +28,13 @@
   "siteNavigation": [
     {
       "href": "/",
-      "label": "Overview",
+      "label": "Home",
       "description": "Main product landing page."
     },
     {
       "href": "/blog",
       "label": "Blog",
       "description": "Jekyll-powered guides and feature documentation."
-    },
-    {
-      "href": "/docs/getting-started",
-      "label": "Docs",
-      "description": "Deployment and permission guidance."
     },
     {
       "href": "/about",
@@ -55,14 +50,8 @@
   "headerActions": [
     {
       "href": "/login",
-      "label": "Sign in",
-      "description": "Open the production login flow.",
-      "tone": "secondary"
-    },
-    {
-      "href": "/app",
-      "label": "Open app",
-      "description": "Open the authenticated reporting workspace.",
+      "label": "Open login",
+      "description": "Open the primary reporting and sign-in route.",
       "tone": "primary"
     }
   ],

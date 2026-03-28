@@ -14,11 +14,11 @@ import { withBase } from "@/lib/paths";
         <p class="text-sm font-semibold uppercase tracking-[0.2em] text-sky-500">404</p>
         <h1 class="mt-4 text-4xl font-semibold text-ink-950">This route does not exist.</h1>
         <p class="mx-auto mt-4 max-w-xl text-base leading-8 text-ink-700">
-          Head back to the home page or open the reporting app if you are already signed in.
+          Head back to the home page or open the login route to start reporting.
         </p>
         <div class="mt-8 flex justify-center gap-3">
           <a href={withBase("/")} class="rounded-full bg-ink-900 px-5 py-3 text-sm font-semibold text-white">Go home</a>
-          <a href={withBase("/app")} class="rounded-full border border-ink-900/10 px-5 py-3 text-sm font-semibold text-ink-800">Open app</a>
+          <a href={withBase("/login")} class="rounded-full border border-ink-900/10 px-5 py-3 text-sm font-semibold text-ink-800">Open login</a>
         </div>
       </div>
     </div>

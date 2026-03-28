@@ -1,5 +1,5 @@
 ---
-import { ecosystemLinks, headerActions, siteConfig, siteNavigation, socialLinks } from "@/lib/site";
+import { headerActions, siteConfig, siteNavigation } from "@/lib/site";
 import { resolveHref, withBase } from "@/lib/paths";
 
 const currentPath = Astro.url.pathname.replace(/\/+$/, "") || "/";
@@ -7,20 +7,20 @@ const currentPath = Astro.url.pathname.replace(/\/+$/, "") || "/";
 
 <header class="sticky top-0 z-50 pt-4">
   <div class="page-frame">
-    <div class="glass-panel rounded-[2rem] px-5 py-4 md:px-6">
-      <div class="flex flex-col gap-5">
-        <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <a href={withBase("/")} class="flex items-center gap-4">
-            <span class="flex h-12 w-12 items-center justify-center rounded-[1.1rem] bg-linear-to-br from-sky-400/70 to-ink-900 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-lg">
-              M
-            </span>
-            <div>
-              <p class="text-sm font-semibold uppercase tracking-[0.18em] text-ink-950">{siteConfig.name}</p>
-              <p class="mt-1 text-xs uppercase tracking-[0.18em] text-ink-600">Zero-storage Microsoft 365 reporting</p>
-            </div>
-          </a>
+    <div class="glass-panel rounded-[1.75rem] px-5 py-4 md:px-6">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <a href={withBase("/")} class="flex items-center gap-4">
+          <span class="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-linear-to-br from-sky-400/85 to-ink-900 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-lg">
+            M
+          </span>
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-ink-950">{siteConfig.name}</p>
+            <p class="mt-1 text-xs text-ink-600">Read-only tenant reporting for Microsoft 365</p>
+          </div>
+        </a>
 
-          <nav class="flex flex-wrap items-center gap-2 rounded-full border border-ink-900/6 bg-white/80 p-2 shadow-sm xl:justify-center">
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
+          <nav class="flex flex-wrap items-center gap-2">
             {siteNavigation.map((item) => {
               const normalizedItemHref = item.href.replace(/\/+$/, "") || "/";
               const isActive =
@@ -33,7 +33,7 @@ const currentPath = Astro.url.pathname.replace(/\/+$/, "") || "/";
                     "rounded-full px-4 py-2 text-sm font-semibold transition",
                     isActive
                       ? "bg-ink-900 text-white shadow-sm"
-                      : "text-ink-700 hover:bg-sand-100 hover:text-ink-950"
+                      : "text-ink-700 hover:bg-white hover:text-ink-950"
                   ]}
                 >
                   {item.label}
@@ -53,35 +53,6 @@ const currentPath = Astro.url.pathname.replace(/\/+$/, "") || "/";
                     "border border-ink-900/10 bg-white/90 text-ink-800 hover:-translate-y-0.5 hover:border-ink-900/25 hover:bg-white"
                 ]}
                 title={item.description}
-              >
-                {item.label}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        <div class="grid gap-3 border-t border-ink-900/8 pt-4 xl:grid-cols-[1fr_auto] xl:items-center">
-          <div class="flex flex-wrap gap-2">
-            {ecosystemLinks.map((item) => (
-              <a
-                href={resolveHref(item)}
-                class="rounded-full border border-ink-900/10 bg-white/90 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-700 transition hover:-translate-y-0.5 hover:border-ink-900/25 hover:text-ink-950"
-                target="_blank"
-                rel="noreferrer"
-                title={item.description}
-              >
-                {item.label}
-              </a>
-            ))}
-          </div>
-
-          <div class="flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-700 xl:justify-end">
-            {socialLinks.map((item) => (
-              <a
-                href={resolveHref(item)}
-                class="rounded-full border border-transparent bg-white/0 px-3 py-1.5 transition hover:-translate-y-0.5 hover:border-ink-900/10 hover:bg-white/90 hover:text-ink-950"
-                target="_blank"
-                rel="noreferrer"
               >
                 {item.label}
               </a>
