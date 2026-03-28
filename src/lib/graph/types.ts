@@ -5,6 +5,7 @@ export interface GraphCollectionResponse<T> {
 
 export interface GraphAssignedLicense {
   skuId: string;
+  disabledPlans?: string[];
 }
 
 export interface GraphSignInActivity {
@@ -23,6 +24,13 @@ export interface GraphUser {
   signInActivity?: GraphSignInActivity | null;
 }
 
+export interface GraphServicePlan {
+  servicePlanId: string;
+  servicePlanName: string;
+  provisioningStatus?: string | null;
+  appliesTo?: string | null;
+}
+
 export interface GraphPrepaidUnits {
   enabled?: number;
   lockedOut?: number;
@@ -36,6 +44,7 @@ export interface GraphSubscribedSku {
   consumedUnits: number;
   capabilityStatus?: string | null;
   prepaidUnits?: GraphPrepaidUnits | null;
+  servicePlans?: GraphServicePlan[];
 }
 
 export interface GraphGroup {
@@ -45,4 +54,30 @@ export interface GraphGroup {
   securityEnabled?: boolean | null;
   groupTypes?: string[];
   members?: Array<{ id: string }>;
+}
+
+export interface GraphDirectoryRole {
+  id: string;
+  displayName?: string | null;
+  description?: string | null;
+  roleTemplateId?: string | null;
+}
+
+export interface GraphDirectoryRoleMember {
+  id: string;
+  displayName?: string | null;
+  userPrincipalName?: string | null;
+}
+
+export interface GraphMfaRegistrationDetail {
+  id: string;
+  userPrincipalName?: string | null;
+  userDisplayName?: string | null;
+  isMfaRegistered?: boolean;
+  isMfaCapable?: boolean;
+  isSsprRegistered?: boolean;
+  isSsprEnabled?: boolean;
+  isSsprCapable?: boolean;
+  isPasswordlessCapable?: boolean;
+  methodsRegistered?: string[];
 }

@@ -21,11 +21,11 @@ const structuredData = [
       priceCurrency: "USD"
     },
     featureList: [
-      "Microsoft 365 user inventory reporting",
-      "License capacity and consumption analysis",
-      "Group membership counting",
-      "Shared mailbox identification",
-      "Activity report collection",
+      "Microsoft 365 user and group inventory",
+      "License capacity and service plan analysis",
+      "SharePoint and OneDrive usage reporting",
+      "MFA coverage and security scoring",
+      "Admin role analysis and inactive user detection",
       "CSV, JSON, Excel, and HTML exports",
       "Browser-only data collection",
       "Zero server storage"
@@ -58,23 +58,24 @@ const structuredData = [
 ---
 
 <BaseLayout
-  title={`${siteConfig.name} | Read-only Microsoft 365 reporting`}
-  description="Read-only Microsoft 365 tenant reporting with a clean login flow, browser-only Graph collection, and local export generation. Users, licenses, groups, mailboxes, and activity reports."
+  title={`${siteConfig.name} | Microsoft 365 Usage, License & Security Insights`}
+  description="Free browser-based Microsoft 365 reporting platform. Users, licenses, groups, SharePoint, OneDrive, MFA coverage, security scoring, and local exports — zero server storage."
   keywords={[
     ...siteConfig.defaultKeywords,
-    "microsoft 365 reporting platform",
-    "zero-storage saas reporting",
-    "browser-only microsoft graph reporting",
-    "m365 license usage report",
-    "microsoft 365 admin reporting tool"
+    "microsoft 365 security insights",
+    "m365 mfa coverage report",
+    "sharepoint usage report",
+    "onedrive usage analytics",
+    "m365 security score",
+    "microsoft 365 admin reporting"
   ]}
   structuredData={structuredData}
 >
   <HomeHero />
 
   <SectionBlock
-    title="Everything starts from one clean dashboard"
-    description="Sign in with Microsoft Entra, generate reports, and export — all from a single app route."
+    title="Sign in, collect, export — in one session"
+    description="Connect with Microsoft Entra, generate reports across your entire tenant, and download clean exports. Everything runs in the browser."
   >
     <div class="grid gap-4 md:grid-cols-3">
       <article class="fine-border card-hover rounded-2xl bg-white p-6">
@@ -85,8 +86,8 @@ const structuredData = [
             <line x1="15" y1="12" x2="3" y2="12" />
           </svg>
         </div>
-        <h3 class="text-base font-bold text-ink-950">Sign in</h3>
-        <p class="mt-2 text-sm leading-7 text-ink-600">Use Microsoft Entra delegated access directly from the app dashboard.</p>
+        <h3 class="text-base font-bold text-ink-950">Authenticate</h3>
+        <p class="mt-2 text-sm leading-7 text-ink-600">Sign in with Microsoft Entra delegated access. Reports start collecting automatically.</p>
       </article>
       <article class="fine-border card-hover rounded-2xl bg-white p-6">
         <div class="icon-container bg-mint-500/10 text-mint-500 mb-4">
@@ -94,8 +95,8 @@ const structuredData = [
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
           </svg>
         </div>
-        <h3 class="text-base font-bold text-ink-950">Generate</h3>
-        <p class="mt-2 text-sm leading-7 text-ink-600">Collect users, licenses, groups, and mailbox insights inside the current browser session.</p>
+        <h3 class="text-base font-bold text-ink-950">Analyze</h3>
+        <p class="mt-2 text-sm leading-7 text-ink-600">View users, licenses, usage, and security insights with interactive charts and tables.</p>
       </article>
       <article class="fine-border card-hover rounded-2xl bg-white p-6">
         <div class="icon-container bg-violet-500/10 text-violet-500 mb-4">
@@ -106,21 +107,21 @@ const structuredData = [
           </svg>
         </div>
         <h3 class="text-base font-bold text-ink-950">Export</h3>
-        <p class="mt-2 text-sm leading-7 text-ink-600">Download clean CSV, JSON, Excel, or HTML files without keeping a persistent tenant dataset.</p>
+        <p class="mt-2 text-sm leading-7 text-ink-600">Download CSV, JSON, Excel, or HTML files. All data stays in your browser session.</p>
       </article>
     </div>
   </SectionBlock>
 
   <SectionBlock
-    title="Core reports"
-    description="The product focuses on inventory and visibility. It is intentionally read-only and avoids remediation features."
+    title="Nine reporting modules in one dashboard"
+    description="From basic inventory to security scoring — everything a Microsoft 365 admin needs for tenant visibility."
   >
     <CapabilityGrid />
   </SectionBlock>
 
   <SectionBlock
-    title="Feature guides and walkthroughs"
-    description="The Jekyll blog explains each report in a search-friendly format, including exports, license availability, group counts, and shared mailboxes."
+    title="Feature guides"
+    description="Step-by-step documentation for every reporting capability."
   >
     <GuidePreviewGrid />
   </SectionBlock>

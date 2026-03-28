@@ -35,7 +35,7 @@ describe("collectTenantReportSnapshot", () => {
         });
       }
 
-      if (url.endsWith("/subscribedSkus")) {
+      if (url.includes("/subscribedSkus")) {
         return jsonResponse({
           value: [
             {
@@ -48,7 +48,10 @@ describe("collectTenantReportSnapshot", () => {
                 lockedOut: 0,
                 suspended: 0,
                 warning: 0
-              }
+              },
+              servicePlans: [
+                { servicePlanId: "sp-1", servicePlanName: "EXCHANGE_S_ENTERPRISE", provisioningStatus: "Success" }
+              ]
             }
           ]
         });
@@ -87,6 +90,16 @@ describe("collectTenantReportSnapshot", () => {
         return new Response("Not found", { status: 404 });
       }
 
+      // Reports endpoints — unavailable in test
+      if (url.includes("/reports/")) {
+        return new Response("Forbidden", { status: 403 });
+      }
+
+      // Directory roles — empty
+      if (url.includes("/directoryRoles")) {
+        return jsonResponse({ value: [] });
+      }
+
       throw new Error(`Unexpected request: ${url}`);
     });
 
@@ -111,6 +124,9 @@ describe("collectTenantReportSnapshot", () => {
     expect(snapshot.overview.availableLicenses).toBe(6);
     expect(snapshot.users[0]?.assignedSkuNames).toContain("Office 365 E3");
     expect(snapshot.activity.every((dataset) => dataset.status === "unavailable")).toBe(true);
+    expect(snapshot.sharePoint.summary.status).toBe("unavailable");
+    expect(snapshot.oneDrive.summary.status).toBe("unavailable");
+    expect(snapshot.security).toBeDefined();
     expect(snapshot.notes.some((note) => note.includes("service principal members"))).toBe(true);
     expect(snapshot.notes.some((note) => note.includes("mailboxSettings.userPurpose"))).toBe(true);
   });

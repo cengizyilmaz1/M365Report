@@ -9,16 +9,49 @@ const structuredData = {
   url: `${siteConfig.siteUrl}${siteConfig.privacyPath}`,
   description: "Zero-storage privacy model. Browser-only data collection."
 };
+
+const principles = [
+  {
+    title: "Browser-only collection",
+    desc: "All Microsoft Graph API calls are made directly from your browser using delegated access tokens. There is no proxy, middleware, or server-side component involved in data collection.",
+    icon: "M12 2a10 10 0 1 0 0 20 10 10 0 1 0 0-20z M2 12h20"
+  },
+  {
+    title: "Session-only storage",
+    desc: "Report data exists only in browser memory for the duration of your session. Closing the tab, refreshing the page, or signing out removes all collected data immediately.",
+    icon: "M12 2v4 M12 18v4 M4.93 4.93l2.83 2.83 M16.24 16.24l2.83 2.83 M2 12h4 M18 12h4 M4.93 19.07l2.83-2.83 M16.24 7.76l2.83-2.83"
+  },
+  {
+    title: "Local exports only",
+    desc: "CSV, JSON, Excel, and HTML files are generated entirely in the browser and downloaded directly to your device. No export data is transmitted to any server.",
+    icon: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M7 10l5 5 5-5 M12 15V3"
+  },
+  {
+    title: "No server-side database",
+    desc: "There is no database, no analytics pipeline, and no telemetry collection. The application is a static site deployed to GitHub Pages with no backend infrastructure.",
+    icon: "M4 7V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3 M14 2v6h6 M2 15h10 M9 18l3-3-3-3"
+  },
+  {
+    title: "Read-only permissions",
+    desc: "The application requests only read-focused delegated Microsoft Graph scopes. It cannot modify users, groups, licenses, or any other tenant configuration.",
+    icon: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z M12 9a3 3 0 1 0 0 6 3 3 0 1 0 0-6z"
+  },
+  {
+    title: "Open source",
+    desc: "The full source code is publicly available. You can audit the codebase to verify that no data is transmitted, stored, or processed outside of your browser.",
+    icon: "M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+  }
+];
 ---
 
 <BaseLayout
   title="Privacy | M365 Tenant Reporter"
-  description="M365 Tenant Reporter does not store tenant data. All collection happens in the browser and stays in the current session."
-  keywords={["m365 privacy", "zero-storage reporting", "browser-only data collection"]}
+  description="M365 Tenant Reporter does not store tenant data. All data collection happens in the browser and stays in the current session."
+  keywords={["m365 privacy", "zero-storage reporting", "browser-only data collection", "microsoft 365 privacy"]}
   structuredData={structuredData}
 >
   <section class="section-space">
-    <div class="page-frame max-w-3xl">
+    <div class="page-frame max-w-4xl">
       <div class="glass-panel rounded-3xl p-8 md:p-12 animate-fade-up">
         <span class="badge badge-mint mb-6">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -32,54 +65,33 @@ const structuredData = {
           Your tenant data never leaves the browser.
         </h1>
 
-        <div class="mt-8 space-y-6">
-          <div class="flex items-start gap-4">
-            <div class="icon-container bg-mint-500/10 text-mint-500 shrink-0 mt-1">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-base font-bold text-ink-950">Browser-only collection</h2>
-              <p class="mt-1 text-sm leading-7 text-ink-600">Microsoft Graph data is fetched directly from your browser after delegated sign-in. No proxy, no backend.</p>
-            </div>
-          </div>
+        <p class="mt-4 text-base leading-8 text-ink-600 max-w-3xl">
+          M365 Tenant Reporter is designed with a zero-trust privacy model. No data is sent to any server, no analytics are collected, and no session information persists after the browser tab is closed.
+        </p>
 
-          <div class="flex items-start gap-4">
-            <div class="icon-container bg-mint-500/10 text-mint-500 shrink-0 mt-1">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-base font-bold text-ink-950">Session-only storage</h2>
-              <p class="mt-1 text-sm leading-7 text-ink-600">Report data lives in memory. Close the tab, refresh, or sign out to remove everything.</p>
-            </div>
-          </div>
+        <div class="divider my-8"></div>
 
-          <div class="flex items-start gap-4">
-            <div class="icon-container bg-mint-500/10 text-mint-500 shrink-0 mt-1">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
+        <div class="space-y-5">
+          {principles.map((item) => (
+            <div class="flex items-start gap-4 rounded-xl border border-ink-900/6 bg-white p-5 transition hover:border-mint-500/20">
+              <div class="icon-container bg-mint-500/10 text-mint-500 shrink-0 mt-0.5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={item.icon} /></svg>
+              </div>
+              <div>
+                <h2 class="text-base font-bold text-ink-950">{item.title}</h2>
+                <p class="mt-1 text-sm leading-7 text-ink-600">{item.desc}</p>
+              </div>
             </div>
-            <div>
-              <h2 class="text-base font-bold text-ink-950">Local exports</h2>
-              <p class="mt-1 text-sm leading-7 text-ink-600">CSV, JSON, Excel, and HTML files are generated locally and downloaded to your device. Nothing is uploaded back.</p>
-            </div>
-          </div>
+          ))}
+        </div>
 
-          <div class="flex items-start gap-4">
-            <div class="icon-container bg-mint-500/10 text-mint-500 shrink-0 mt-1">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </div>
-            <div>
-              <h2 class="text-base font-bold text-ink-950">No server-side database</h2>
-              <p class="mt-1 text-sm leading-7 text-ink-600">Users, groups, licenses, and activity rows are not stored in any backend database.</p>
-            </div>
-          </div>
+        <div class="divider my-8"></div>
+
+        <div class="rounded-xl bg-ink-900/[0.02] border border-ink-900/6 p-5">
+          <p class="text-sm font-semibold text-ink-950">Data flow summary</p>
+          <p class="mt-2 text-sm leading-7 text-ink-600">
+            Browser → Microsoft Graph API (with delegated token) → Browser memory → Local file download. At no point in this flow does data pass through a third-party server or persistent storage layer.
+          </p>
         </div>
       </div>
     </div>

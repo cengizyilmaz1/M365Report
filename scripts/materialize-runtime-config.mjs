@@ -13,7 +13,7 @@ const config = normalizeConfig(
     authority: process.env.PUBLIC_AUTHORITY ?? "https://login.microsoftonline.com/organizations",
     clientId: process.env.PUBLIC_CLIENT_ID ?? "REPLACE_WITH_ENTRA_CLIENT_ID",
     knownAuthorities: splitList(process.env.PUBLIC_KNOWN_AUTHORITIES),
-    loginRedirectPath: process.env.PUBLIC_LOGIN_REDIRECT_PATH ?? "/login",
+    loginRedirectPath: process.env.PUBLIC_LOGIN_REDIRECT_PATH ?? "/app",
     postLogoutRedirectPath: process.env.PUBLIC_POST_LOGOUT_REDIRECT_PATH ?? "/",
     coreScopes: splitList(
       process.env.PUBLIC_CORE_SCOPES ??

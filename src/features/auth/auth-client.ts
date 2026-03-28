@@ -60,7 +60,7 @@ export function getScopes(config: AuthConfig, group: PermissionGroup, includeIde
 export async function login(instance: PublicClientApplication, config: AuthConfig) {
   await instance.loginRedirect({
     scopes: [...config.coreScopes, ...config.reportsScopes],
-    redirectStartPage: window.location.href
+    redirectStartPage: config.redirectUri
   });
 }
 

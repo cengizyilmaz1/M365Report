@@ -5,7 +5,7 @@
   "authority": "https://login.microsoftonline.com/organizations",
   "clientId": "REPLACE_WITH_ENTRA_CLIENT_ID",
   "knownAuthorities": [],
-  "loginRedirectPath": "/login",
+  "loginRedirectPath": "/app",
   "postLogoutRedirectPath": "/",
   "coreScopes": [
     "openid",

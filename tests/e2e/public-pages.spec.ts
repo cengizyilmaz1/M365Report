@@ -4,7 +4,7 @@ test("home page renders core messaging and seo metadata", async ({ page }) => {
   await page.goto("/");
 
   await expect(page).toHaveTitle(/M365 Tenant Reporter/);
-  await expect(page.getByRole("heading", { name: /Generate Microsoft 365 tenant reports without storing tenant data/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Microsoft 365 usage, license/i })).toBeVisible();
   await expect(page.locator("link[rel='canonical']")).toHaveCount(1);
 });
 
@@ -30,7 +30,7 @@ test("blog routes render discoverable guidance content", async ({ page }) => {
 test("static about and privacy pages render from dedicated routes", async ({ page }) => {
   await page.goto("/about");
   await expect(page).toHaveTitle(/About \| M365 Tenant Reporter/);
-  await expect(page.getByRole("heading", { name: /Read-only reporting for Microsoft 365/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Microsoft 365 insights platform/i })).toBeVisible();
 
   await page.goto("/privacy");
   await expect(page).toHaveTitle(/Privacy \| M365 Tenant Reporter/);

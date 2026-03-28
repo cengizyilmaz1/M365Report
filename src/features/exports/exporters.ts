@@ -1,7 +1,18 @@
 import type { ExportArtifact, TenantReportSnapshot } from "@/lib/types/reporting";
 
 export type ExportFormat = "xlsx" | "csv" | "json" | "html";
-export type DatasetKey = "overview" | "users" | "licenses" | "groups" | "mailboxes" | "activity";
+export type DatasetKey =
+  | "overview"
+  | "users"
+  | "licenses"
+  | "licenseServices"
+  | "groups"
+  | "mailboxes"
+  | "activity"
+  | "sharepoint"
+  | "onedrive"
+  | "security"
+  | "adminRoles";
 
 export async function exportDataset(
   snapshot: TenantReportSnapshot,
@@ -43,6 +54,8 @@ function buildRows(snapshot: TenantReportSnapshot, dataset: DatasetKey) {
       })) as Array<Record<string, unknown>>;
     case "licenses":
       return snapshot.licenses.map((row) => ({ ...row })) as Array<Record<string, unknown>>;
+    case "licenseServices":
+      return snapshot.licenseServices.map((row) => ({ ...row })) as Array<Record<string, unknown>>;
     case "groups":
       return snapshot.groups.map((row) => ({ ...row })) as Array<Record<string, unknown>>;
     case "mailboxes":
@@ -57,6 +70,25 @@ function buildRows(snapshot: TenantReportSnapshot, dataset: DatasetKey) {
           ...row.metrics
         }))
       ) as Array<Record<string, unknown>>;
+    case "sharepoint":
+      return snapshot.sharePoint.sites.map((row) => ({
+        ...row,
+        storageUsedMB: Math.round(row.storageUsedBytes / 1048576),
+        storageAllocatedMB: Math.round(row.storageAllocatedBytes / 1048576)
+      })) as Array<Record<string, unknown>>;
+    case "onedrive":
+      return snapshot.oneDrive.accounts.map((row) => ({
+        ...row,
+        storageUsedMB: Math.round(row.storageUsedBytes / 1048576),
+        storageAllocatedMB: Math.round(row.storageAllocatedBytes / 1048576)
+      })) as Array<Record<string, unknown>>;
+    case "security":
+      return snapshot.security.users.map((row) => ({
+        ...row,
+        methodsRegistered: row.methodsRegistered.join(", ")
+      })) as Array<Record<string, unknown>>;
+    case "adminRoles":
+      return snapshot.security.adminRoles.map((row) => ({ ...row })) as Array<Record<string, unknown>>;
     default:
       return [];
   }
@@ -90,39 +122,25 @@ function exportHtml(snapshot: TenantReportSnapshot, dataset: DatasetKey): Export
 }
 
 function buildCsv(rows: Array<Record<string, unknown>>) {
-  if (rows.length === 0) {
-    return "";
-  }
-
+  if (rows.length === 0) return "";
   const headers = Object.keys(rows[0]);
   const lines = [
     headers.join(","),
-    ...rows.map((row) =>
-      headers
-        .map((header) => escapeCsv(String(row[header] ?? "")))
-        .join(",")
-    )
+    ...rows.map((row) => headers.map((header) => escapeCsv(String(row[header] ?? ""))).join(","))
   ];
-
   return lines.join("\n");
 }
 
 function buildHtmlTable(rows: Array<Record<string, unknown>>) {
-  if (rows.length === 0) {
-    return "<p>No rows were available for this dataset.</p>";
-  }
-
+  if (rows.length === 0) return "<p>No rows were available for this dataset.</p>";
   const headers = Object.keys(rows[0]);
   const head = headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("");
   const body = rows
     .map((row) => {
-      const cells = headers
-        .map((header) => `<td>${escapeHtml(String(row[header] ?? ""))}</td>`)
-        .join("");
+      const cells = headers.map((header) => `<td>${escapeHtml(String(row[header] ?? ""))}</td>`).join("");
       return `<tr>${cells}</tr>`;
     })
     .join("");
-
   return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
 }
 
@@ -130,27 +148,15 @@ function downloadBlob(filename: string, mimeType: string, content: string | Arra
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
-
   anchor.href = url;
   anchor.download = filename;
   anchor.click();
-
-  queueMicrotask(() => {
-    URL.revokeObjectURL(url);
-  });
-
-  return {
-    filename,
-    mimeType,
-    byteLength: blob.size
-  };
+  queueMicrotask(() => { URL.revokeObjectURL(url); });
+  return { filename, mimeType, byteLength: blob.size };
 }
 
 function escapeCsv(value: string) {
-  if (/[",\n]/.test(value)) {
-    return `"${value.replaceAll('"', '""')}"`;
-  }
-
+  if (/[",\n]/.test(value)) return `"${value.replaceAll('"', '""')}"`;
   return value;
 }
 
