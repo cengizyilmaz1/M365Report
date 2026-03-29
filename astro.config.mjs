@@ -9,7 +9,12 @@ const base = process.env.PUBLIC_BASE_PATH ?? "/";
 export default defineConfig({
   site,
   base,
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap({
+      filter: (page) => !page.includes("/app") && !page.includes("/login")
+    })
+  ],
   vite: {
     plugins: [tailwindcss()],
     build: {

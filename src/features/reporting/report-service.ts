@@ -7,6 +7,7 @@ import type {
   GraphDirectoryRoleMember,
   GraphGroup,
   GraphMfaRegistrationDetail,
+  GraphOrganization,
   GraphSubscribedSku,
   GraphUser
 } from "@/lib/graph/types";
@@ -28,6 +29,7 @@ import type {
   SecurityUserRow,
   SharePointSiteRow,
   SharePointSummary,
+  TenantInfo,
   TenantOverview,
   TenantReportSnapshot,
   UserReportRow
@@ -36,9 +38,9 @@ import { mapWithConcurrency } from "@/lib/utils/concurrency";
 
 const INACTIVE_THRESHOLD_DAYS = 30;
 export const BROWSER_ONLY_REPORTS_NOTE =
-  "Microsoft Graph usage reports are delivered as short-lived redirected CSV downloads. In this browser-only deployment, those workload details cannot be read reliably. Use a server-side collector or private deployment for activity, SharePoint, and OneDrive usage reports.";
+  "Microsoft Graph usage reports require the Reports Reader admin role. If you see this message, the CSV download redirect could not be read by the browser session.";
 export const BROWSER_ONLY_ONEDRIVE_NOTE =
-  "Tenant-wide OneDrive inventory is intentionally disabled in this browser-only deployment. Delegated Graph drive requests can automatically provision missing user drives, and the usage-report endpoints are redirected CSV downloads.";
+  "OneDrive inventory requires Sites.Read.All or Files.Read.All scope. Drive metadata is collected per-user for licensed OneDrive accounts.";
 export const SITES_SCOPE_NOTE =
   "Sites.Read.All has not been granted for this session. Add the Sites.Read.All delegated scope to load SharePoint site inventory.";
 
@@ -82,9 +84,9 @@ export async function collectTenantReportSnapshot(
   const graph = new GraphClient(acquireGraphToken);
   const notes: string[] = [];
 
-  const [users, subscribedSkus, groups, signInCollection] = await Promise.all([
+  const [users, subscribedSkus, groups, signInCollection, orgResult] = await Promise.all([
     graph.getAllPages<GraphUser>(
-      "/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,officeLocation,usageLocation,preferredLanguage,assignedLicenses&$top=999"
+      "/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,companyName,officeLocation,usageLocation,preferredLanguage,createdDateTime,assignedLicenses&$top=999"
     ),
     graph.getJson<{ value: GraphSubscribedSku[] }>(
       "/subscribedSkus?$select=skuId,skuPartNumber,consumedUnits,capabilityStatus,prepaidUnits,servicePlans"
@@ -92,10 +94,11 @@ export async function collectTenantReportSnapshot(
     graph.getAllPages<GraphGroup>(
       "/groups?$select=id,displayName,mail,mailEnabled,securityEnabled,groupTypes,visibility,createdDateTime&$top=999"
     ),
-    collectLastSignInIndex(graph, permissionProfile)
+    collectLastSignInIndex(graph, permissionProfile),
+    collectTenantInfo(graph)
   ]);
 
-  const skuNameById = new Map(
+  const skuNameById = new Map<string, string>(
     subscribedSkus.map((sku) => [sku.skuId.toLowerCase(), resolveSkuFriendlyName(sku.skuPartNumber)])
   );
   const licenseRows = buildLicenseRows(subscribedSkus);
@@ -107,7 +110,7 @@ export async function collectTenantReportSnapshot(
       buildMailboxRows(graph, users, notes),
       buildActivityDatasets(graph, permissionProfile),
       collectSharePointData(graph, permissionProfile, groups),
-      collectOneDriveData(graph, permissionProfile),
+      collectOneDriveData(graph, permissionProfile, users),
       collectSecurityInsights(graph, users, skuNameById, signInCollection, permissionProfile),
       buildLicenseServiceRows(graph, users, subscribedSkus)
     ]);
@@ -115,6 +118,7 @@ export async function collectTenantReportSnapshot(
   const overview = buildOverview(userRows, licenseRows, groupRows, mailboxRows, users);
 
   return {
+    tenantInfo: orgResult,
     overview,
     users: userRows,
     licenses: licenseRows,
@@ -151,6 +155,8 @@ function buildUserRows(
         officeLocation: user.officeLocation ?? "Not set",
         usageLocation: user.usageLocation ?? "Not set",
         preferredLanguage: user.preferredLanguage ?? "Not set",
+        companyName: user.companyName ?? "Not set",
+        createdDateTime: user.createdDateTime ?? null,
         assignedLicenseCount: assignedLicenseIds.length,
         assignedSkuNames: assignedLicenseIds.map((skuId) => skuNameById.get(skuId) ?? skuId),
         lastSuccessfulSignIn: signInIndex.get(user.id) ?? null
@@ -369,16 +375,6 @@ async function buildActivityDatasets(
     }));
   }
 
-  if (isBrowserOnlyRuntime()) {
-    return activityWorkloads.map((dataset) => ({
-      workload: dataset.workload,
-      title: dataset.title,
-      rows: [],
-      status: "unavailable",
-      note: BROWSER_ONLY_REPORTS_NOTE
-    }));
-  }
-
   const datasets = await Promise.all(
     activityWorkloads.map(async (dataset) => {
       try {
@@ -503,16 +499,96 @@ async function collectSharePointData(
 }
 
 async function collectOneDriveData(
-  _graph: GraphClient,
-  permissionProfile: PermissionProfile
+  graph: GraphClient,
+  permissionProfile: PermissionProfile,
+  users: GraphUser[]
 ): Promise<{ summary: OneDriveSummary; accounts: OneDriveAccountRow[] }> {
   const empty: { summary: OneDriveSummary; accounts: OneDriveAccountRow[] } = {
     summary: { totalAccounts: 0, activeAccounts: 0, inactiveAccounts: 0, totalStorageUsedBytes: 0, status: "unavailable", note: BROWSER_ONLY_ONEDRIVE_NOTE },
     accounts: []
   };
 
-  if (!permissionProfile.reports.granted && !permissionProfile.sites.granted) return empty;
-  return empty;
+  if (!permissionProfile.sites.granted) {
+    return {
+      summary: { ...empty.summary, note: "Sites.Read.All has not been granted. Add this scope to collect OneDrive inventory." },
+      accounts: []
+    };
+  }
+
+  const licensedUsers = users.filter((u) => u.accountEnabled && (u.assignedLicenses ?? []).length > 0 && u.userType !== "Guest");
+
+  if (licensedUsers.length === 0) {
+    return {
+      summary: { totalAccounts: 0, activeAccounts: 0, inactiveAccounts: 0, totalStorageUsedBytes: 0, status: "available", note: "No licensed internal users found." },
+      accounts: []
+    };
+  }
+
+  try {
+    const now = Date.now();
+    const thresholdMs = INACTIVE_THRESHOLD_DAYS * 24 * 60 * 60 * 1000;
+
+    const driveResults = await mapWithConcurrency(licensedUsers, 4, async (user) => {
+      try {
+        const drive = await graph.getJson<GraphDrive>(
+          `/users/${user.id}/drive?$select=id,name,webUrl,driveType,lastModifiedDateTime,quota`,
+          "sites"
+        );
+
+        const lastModifiedDate = drive.lastModifiedDateTime ?? "";
+        const lastModifiedTime = lastModifiedDate ? new Date(lastModifiedDate).getTime() : 0;
+        const isActive = lastModifiedTime > 0 && (now - lastModifiedTime) < thresholdMs;
+
+        return {
+          ownerPrincipalName: user.userPrincipalName ?? "N/A",
+          ownerDisplayName: user.displayName ?? "Unknown",
+          lastActivityDate: lastModifiedDate,
+          fileCount: 0,
+          storageUsedBytes: Math.max(drive.quota?.used ?? 0, 0),
+          storageAllocatedBytes: Math.max(drive.quota?.total ?? 0, 0),
+          isActive
+        } satisfies OneDriveAccountRow;
+      } catch (error) {
+        if (error instanceof GraphApiError && [403, 404].includes(error.status)) {
+          return null;
+        }
+        throw error;
+      }
+    });
+
+    const accounts = driveResults
+      .filter((row): row is OneDriveAccountRow => Boolean(row))
+      .sort((left, right) => left.ownerDisplayName.localeCompare(right.ownerDisplayName));
+
+    const activeAccounts = accounts.filter((a) => a.isActive).length;
+    const totalStorageUsedBytes = accounts.reduce((sum, a) => sum + a.storageUsedBytes, 0);
+
+    return {
+      summary: {
+        totalAccounts: accounts.length,
+        activeAccounts,
+        inactiveAccounts: accounts.length - activeAccounts,
+        totalStorageUsedBytes,
+        status: "available",
+        note: `Drive metadata collected for ${accounts.length} of ${licensedUsers.length} licensed users.`
+      },
+      accounts
+    };
+  } catch (error) {
+    return {
+      summary: {
+        totalAccounts: 0,
+        activeAccounts: 0,
+        inactiveAccounts: 0,
+        totalStorageUsedBytes: 0,
+        status: "unavailable",
+        note: error instanceof GraphApiError
+          ? "OneDrive inventory could not be loaded with the current delegated scope set."
+          : "Could not fetch OneDrive inventory."
+      },
+      accounts: []
+    };
+  }
 }
 
 async function collectSecurityInsights(
@@ -738,6 +814,33 @@ function calculateSecurityScore(
   };
 }
 
+async function collectTenantInfo(graph: GraphClient): Promise<TenantInfo | null> {
+  try {
+    const response = await graph.getJson<{ value: GraphOrganization[] }>(
+      "/organization?$select=id,displayName,tenantType,verifiedDomains,createdDateTime,countryLetterCode,preferredLanguage,technicalNotificationMails"
+    );
+
+    const org = response.value[0];
+    if (!org) return null;
+
+    const verifiedDomains = (org.verifiedDomains ?? []).map((d) => d.name ?? "").filter(Boolean);
+    const primaryDomain = (org.verifiedDomains ?? []).find((d) => d.isDefault)?.name ?? verifiedDomains[0] ?? "Unknown";
+
+    return {
+      displayName: org.displayName ?? "Unknown tenant",
+      tenantId: org.id,
+      tenantType: org.tenantType ?? "Unknown",
+      primaryDomain,
+      verifiedDomains,
+      countryCode: org.countryLetterCode ?? "N/A",
+      createdDateTime: org.createdDateTime ?? null,
+      technicalContact: org.technicalNotificationMails?.[0] ?? "Not set"
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function collectLastSignInIndex(
   graph: GraphClient,
   permissionProfile: PermissionProfile
@@ -851,6 +954,3 @@ function buildActivityUnavailableNote(error: unknown) {
   return "This browser-only deployment could not read the redirected workload CSV from Microsoft Graph.";
 }
 
-function isBrowserOnlyRuntime() {
-  return typeof window !== "undefined";
-}

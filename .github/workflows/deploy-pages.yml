@@ -65,7 +65,7 @@ jobs:
           PUBLIC_KNOWN_AUTHORITIES: ${{ vars.PUBLIC_KNOWN_AUTHORITIES }}
           PUBLIC_LOGIN_REDIRECT_PATH: ${{ vars.PUBLIC_LOGIN_REDIRECT_PATH || '/login' }}
           PUBLIC_POST_LOGOUT_REDIRECT_PATH: ${{ vars.PUBLIC_POST_LOGOUT_REDIRECT_PATH || '/' }}
-          PUBLIC_CORE_SCOPES: ${{ vars.PUBLIC_CORE_SCOPES || 'openid,profile,email,User.Read,User.Read.All,GroupMember.Read.All,LicenseAssignment.Read.All,MailboxSettings.Read,RoleManagement.Read.All' }}
+          PUBLIC_CORE_SCOPES: ${{ vars.PUBLIC_CORE_SCOPES || 'openid,profile,email,User.Read,User.Read.All,GroupMember.Read.All,LicenseAssignment.Read.All,MailboxSettings.Read,Organization.Read.All,RoleManagement.Read.All' }}
           PUBLIC_REPORTS_SCOPES: ${{ vars.PUBLIC_REPORTS_SCOPES || 'Reports.Read.All' }}
           PUBLIC_ADVANCED_AUDIT_SCOPES: ${{ vars.PUBLIC_ADVANCED_AUDIT_SCOPES || 'AuditLog.Read.All' }}
           PUBLIC_SITES_SCOPES: ${{ vars.PUBLIC_SITES_SCOPES || 'Sites.Read.All' }}

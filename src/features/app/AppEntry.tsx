@@ -49,6 +49,7 @@ import type {
   OneDriveAccountRow,
   SecurityUserRow,
   SharePointSiteRow,
+  TenantInfo,
   TenantReportSnapshot,
   UserReportRow
 } from "@/lib/types/reporting";
@@ -317,6 +318,7 @@ function ReportingWorkspace() {
       />
 
       {snapshotQuery.isLoading && !snapshot && <LoadingCards />}
+      {snapshot?.tenantInfo && <TenantInfoBanner info={snapshot.tenantInfo} />}
       {snapshot && <WorkspacePanels snapshot={snapshot} activeTab={activeTab} setActiveTab={setActiveTab} onExport={handleExport} acquireGraphToken={auth.acquireGraphToken} />}
     </div>
   );
@@ -508,9 +510,10 @@ function UsersPanel({
     },
     { accessorKey: "jobTitle", header: "Job title" },
     { accessorKey: "department", header: "Department" },
+    { accessorKey: "companyName", header: "Company" },
     { accessorKey: "officeLocation", header: "Office" },
-    { accessorKey: "usageLocation", header: "Usage" },
     { accessorKey: "assignedLicenseCount", header: "Licenses" },
+    { accessorKey: "createdDateTime", header: "Created", cell: ({ row }) => formatDateTime(row.original.createdDateTime) },
     { accessorKey: "lastSuccessfulSignIn", header: "Last sign-in", cell: ({ row }) => formatDateTime(row.original.lastSuccessfulSignIn) },
     {
       id: "view",
@@ -630,7 +633,7 @@ function OverviewPanel({ snapshot, onExport }: { snapshot: TenantReportSnapshot;
         <InsightCard
           title="OneDrive"
           status={snapshot.oneDrive.summary.status}
-          metric="Browser-safe inventory unavailable"
+          metric={snapshot.oneDrive.summary.status === "available" ? `${formatNumber(snapshot.oneDrive.summary.totalAccounts)} drives tracked` : "N/A"}
           note={snapshot.oneDrive.summary.note}
           accent="violet"
         />
@@ -729,7 +732,7 @@ function ActivityPanel({ snapshot, onExport }: { snapshot: TenantReportSnapshot;
   );
 
   if (browserOnlyReportsBlocked) {
-    return <UnavailablePanel title="Activity" note="Microsoft Graph usage detail reports are returned as short-lived CSV download redirects. In this browser-only GitHub Pages deployment, those files cannot be read into the dashboard. Move workload reporting to a server-side collector if you need Office 365, Teams, mailbox, or OneDrive activity tables." />;
+    return <UnavailablePanel title="Activity" note="Microsoft Graph usage detail reports require the Reports Reader admin role and Reports.Read.All permission. If the CSV download redirects cannot be read, ensure your account has the correct Entra role assignment and try refreshing." />;
   }
 
   return (
@@ -840,8 +843,59 @@ function OneDrivePanel({ snapshot, onExport }: { snapshot: TenantReportSnapshot;
     return <UnavailablePanel title="OneDrive" note={oneDrive.summary.note ?? BROWSER_ONLY_ONEDRIVE_NOTE} />;
   }
 
+  const activityData = [
+    { name: "Active drives", value: oneDrive.summary.activeAccounts, color: "#0ea5e9" },
+    { name: "Inactive drives", value: oneDrive.summary.inactiveAccounts, color: "#fbbf24" }
+  ];
+  const topByStorage = [...oneDrive.accounts]
+    .sort((left, right) => right.storageUsedBytes - left.storageUsedBytes)
+    .slice(0, 10)
+    .map((account) => ({
+      name: account.ownerDisplayName.slice(0, 18),
+      GB: Number((account.storageUsedBytes / 1073741824).toFixed(2))
+    }));
+
   return (
     <DatasetPanel title="OneDrive" dataset="onedrive" snapshot={snapshot} onExport={onExport}>
+      {oneDrive.summary.note && (
+        <div className="mb-4 rounded-2xl border border-sky-500/15 bg-sky-500/6 px-4 py-3 text-sm text-ink-700">
+          {oneDrive.summary.note}
+        </div>
+      )}
+
+      <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard label="Total drives" value={formatNumber(oneDrive.summary.totalAccounts)} detail="Licensed user OneDrive accounts" />
+        <MetricCard label="Active drives" value={formatNumber(oneDrive.summary.activeAccounts)} detail="Modified in the last 30 days" accent="positive" />
+        <MetricCard label="Inactive drives" value={formatNumber(oneDrive.summary.inactiveAccounts)} detail="No recent modifications" accent="warning" />
+        <MetricCard label="Storage used" value={formatStorageSize(oneDrive.summary.totalStorageUsedBytes)} detail="Combined across all drives" />
+      </div>
+
+      {oneDrive.accounts.length > 0 && (
+        <div className="mb-6 grid gap-4 xl:grid-cols-2">
+          <ChartCard title="Drive activity" subtitle="Active vs inactive OneDrive accounts">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={activityData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={95} strokeWidth={2} stroke="#fff">
+                  {activityData.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
+                </Pie>
+                <Tooltip contentStyle={tooltipStyle} />
+              </PieChart>
+            </ResponsiveContainer>
+          </ChartCard>
+          <ChartCard title="Top drives by storage" subtitle="Largest OneDrive accounts">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={topByStorage}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(22,39,66,0.06)" />
+                <XAxis dataKey="name" hide />
+                <YAxis stroke="rgba(22,39,66,0.15)" fontSize={11} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Bar dataKey="GB" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        </div>
+      )}
+
       <DataTable data={oneDrive.accounts} columns={oneDriveColumns} searchPlaceholder="Filter OneDrive accounts..." />
     </DatasetPanel>
   );
@@ -1069,6 +1123,37 @@ function CenteredStatus({ title, note, tone, animated, action }: { title: string
         <h2 className="text-lg font-bold text-ink-950">{title}</h2>
         {note && <p className="mt-2 text-sm text-ink-600">{note}</p>}
         {action}
+      </div>
+    </div>
+  );
+}
+
+function TenantInfoBanner({ info }: { info: TenantInfo }) {
+  return (
+    <div className="glass-panel rounded-2xl px-5 py-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <div className="icon-container bg-violet-500/10 text-violet-500">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+              <path d="M10 6h4" /><path d="M10 10h4" /><path d="M10 14h4" /><path d="M10 18h4" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-ink-950">{info.displayName}</h2>
+            <p className="text-xs text-ink-500">{info.primaryDomain} &middot; {info.tenantType} &middot; {info.countryCode}</p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {info.verifiedDomains.slice(0, 4).map((domain) => (
+            <span key={domain} className="badge badge-neutral text-[10px]">{domain}</span>
+          ))}
+          {info.verifiedDomains.length > 4 && (
+            <span className="badge badge-neutral text-[10px]">+{info.verifiedDomains.length - 4} more</span>
+          )}
+        </div>
       </div>
     </div>
   );

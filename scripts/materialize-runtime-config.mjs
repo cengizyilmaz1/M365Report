@@ -17,7 +17,7 @@ const config = normalizeConfig(
     postLogoutRedirectPath: process.env.PUBLIC_POST_LOGOUT_REDIRECT_PATH ?? "/",
     coreScopes: splitList(
       process.env.PUBLIC_CORE_SCOPES ??
-        "openid,profile,email,User.Read,User.Read.All,GroupMember.Read.All,LicenseAssignment.Read.All,MailboxSettings.Read,RoleManagement.Read.All"
+        "openid,profile,email,User.Read,User.Read.All,GroupMember.Read.All,LicenseAssignment.Read.All,MailboxSettings.Read,Organization.Read.All,RoleManagement.Read.All"
     ),
     reportsScopes: splitList(process.env.PUBLIC_REPORTS_SCOPES ?? "Reports.Read.All"),
     advancedAuditScopes: splitList(process.env.PUBLIC_ADVANCED_AUDIT_SCOPES ?? "AuditLog.Read.All"),

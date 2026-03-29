@@ -1,7 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
-  BROWSER_ONLY_ONEDRIVE_NOTE,
-  BROWSER_ONLY_REPORTS_NOTE,
   SITES_SCOPE_NOTE,
   collectTenantReportSnapshot
 } from "./report-service";
@@ -15,7 +13,7 @@ describe("collectTenantReportSnapshot", () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
 
-      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,officeLocation,usageLocation,preferredLanguage,assignedLicenses&$top=999")) {
+      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,companyName,officeLocation,usageLocation,preferredLanguage,createdDateTime,assignedLicenses&$top=999")) {
         return jsonResponse({
           value: [
             {
@@ -96,6 +94,11 @@ describe("collectTenantReportSnapshot", () => {
         return new Response("Not found", { status: 404 });
       }
 
+      // Organization endpoint
+      if (url.includes("/organization")) {
+        return jsonResponse({ value: [{ id: "tenant-1", displayName: "Contoso", tenantType: "AAD", verifiedDomains: [{ name: "contoso.com", isDefault: true }], countryLetterCode: "US" }] });
+      }
+
       // Reports endpoints — unavailable in test
       if (url.includes("/reports/")) {
         return new Response("Forbidden", { status: 403 });
@@ -121,6 +124,7 @@ describe("collectTenantReportSnapshot", () => {
       }
     );
 
+    expect(snapshot.tenantInfo?.displayName).toBe("Contoso");
     expect(snapshot.overview.totalUsers).toBe(2);
     expect(snapshot.overview.licensedUsers).toBe(1);
     expect(snapshot.overview.sharedMailboxes).toBe(1);
@@ -135,17 +139,16 @@ describe("collectTenantReportSnapshot", () => {
     expect(snapshot.sharePoint.summary.status).toBe("unavailable");
     expect(snapshot.sharePoint.summary.note).toBe(SITES_SCOPE_NOTE);
     expect(snapshot.oneDrive.summary.status).toBe("unavailable");
-    expect(snapshot.oneDrive.summary.note).toBe(BROWSER_ONLY_ONEDRIVE_NOTE);
     expect(snapshot.security).toBeDefined();
     expect(snapshot.notes.some((note) => note.includes("service principal members"))).toBe(true);
     expect(snapshot.notes.some((note) => note.includes("mailboxSettings.userPurpose"))).toBe(true);
   });
 
-  it("marks usage reports as unavailable in browser-only mode even when report scopes are granted", async () => {
+  it("collects activity reports when report scopes are granted and handles failures gracefully", async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
 
-      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,officeLocation,usageLocation,preferredLanguage,assignedLicenses&$top=999")) {
+      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,companyName,officeLocation,usageLocation,preferredLanguage,createdDateTime,assignedLicenses&$top=999")) {
         return jsonResponse({ value: [] });
       }
 
@@ -157,8 +160,12 @@ describe("collectTenantReportSnapshot", () => {
         return jsonResponse({ value: [] });
       }
 
+      if (url.includes("/organization")) {
+        return jsonResponse({ value: [] });
+      }
+
       if (url.includes("/reports/")) {
-        throw new Error("Reports endpoints should be skipped in browser-only mode.");
+        return new Response("Forbidden", { status: 403 });
       }
 
       if (url.includes("/directoryRoles")) {
@@ -180,17 +187,17 @@ describe("collectTenantReportSnapshot", () => {
       }
     );
 
-    expect(snapshot.activity.every((dataset) => dataset.note === BROWSER_ONLY_REPORTS_NOTE)).toBe(true);
+    expect(snapshot.activity.every((dataset) => dataset.status === "unavailable")).toBe(true);
     expect(snapshot.sharePoint.summary.status).toBe("available");
     expect(snapshot.sharePoint.summary.note).toContain("No Microsoft 365 group-connected");
-    expect(snapshot.oneDrive.summary.note).toBe(BROWSER_ONLY_ONEDRIVE_NOTE);
+    expect(snapshot.oneDrive.summary.status).toBe("available");
   });
 
   it("builds a browser-safe SharePoint inventory from group document libraries when Sites.Read.All is granted", async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
 
-      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,officeLocation,usageLocation,preferredLanguage,assignedLicenses&$top=999")) {
+      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,companyName,officeLocation,usageLocation,preferredLanguage,createdDateTime,assignedLicenses&$top=999")) {
         return jsonResponse({ value: [] });
       }
 
@@ -232,8 +239,21 @@ describe("collectTenantReportSnapshot", () => {
         });
       }
 
+      if (url.includes("/organization")) {
+        return jsonResponse({ value: [] });
+      }
+
       if (url.includes("/directoryRoles")) {
         return jsonResponse({ value: [] });
+      }
+
+      // Reports and user drives
+      if (url.includes("/reports/")) {
+        return new Response("Forbidden", { status: 403 });
+      }
+
+      if (url.includes("/drive?$select=")) {
+        return new Response("Not found", { status: 404 });
       }
 
       throw new Error(`Unexpected request: ${url}`);

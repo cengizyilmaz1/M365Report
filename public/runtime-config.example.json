@@ -16,6 +16,7 @@
     "GroupMember.Read.All",
     "LicenseAssignment.Read.All",
     "MailboxSettings.Read",
+    "Organization.Read.All",
     "RoleManagement.Read.All"
   ],
   "reportsScopes": [

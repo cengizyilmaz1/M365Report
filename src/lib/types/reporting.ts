@@ -11,6 +11,17 @@ export interface PermissionProfile {
   sites: PermissionCapability;
 }
 
+export interface TenantInfo {
+  displayName: string;
+  tenantId: string;
+  tenantType: string;
+  primaryDomain: string;
+  verifiedDomains: string[];
+  countryCode: string;
+  createdDateTime: string | null;
+  technicalContact: string;
+}
+
 export interface TenantOverview {
   totalUsers: number;
   licensedUsers: number;
@@ -39,6 +50,8 @@ export interface UserReportRow {
   officeLocation: string;
   usageLocation: string;
   preferredLanguage: string;
+  companyName: string;
+  createdDateTime: string | null;
   assignedLicenseCount: number;
   assignedSkuNames: string[];
   lastSuccessfulSignIn?: string | null;
@@ -294,6 +307,7 @@ export interface SecurityInsights {
 }
 
 export interface TenantReportSnapshot {
+  tenantInfo: TenantInfo | null;
   overview: TenantOverview;
   users: UserReportRow[];
   licenses: LicenseReportRow[];

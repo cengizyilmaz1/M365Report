@@ -136,6 +136,24 @@ export interface GraphDirectoryRoleMember {
   userPrincipalName?: string | null;
 }
 
+export interface GraphVerifiedDomain {
+  name?: string | null;
+  isDefault?: boolean | null;
+  isInitial?: boolean | null;
+  type?: string | null;
+}
+
+export interface GraphOrganization {
+  id: string;
+  displayName?: string | null;
+  tenantType?: string | null;
+  verifiedDomains?: GraphVerifiedDomain[];
+  createdDateTime?: string | null;
+  countryLetterCode?: string | null;
+  preferredLanguage?: string | null;
+  technicalNotificationMails?: string[];
+}
+
 export interface GraphMfaRegistrationDetail {
   id: string;
   userPrincipalName?: string | null;

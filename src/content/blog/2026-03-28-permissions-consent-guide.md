@@ -1,6 +1,6 @@
 ---
 title: "How Microsoft Graph permissions and admin consent work in M365 Tenant Reporter"
-description: "A detailed breakdown of every delegated permission scope — openid, profile, email, User.Read, User.Read.All, GroupMember.Read.All, LicenseAssignment.Read.All, MailboxSettings.Read, RoleManagement.Read.All, Sites.Read.All, Reports.Read.All, and AuditLog.Read.All — with guidance on admin consent, security review conversations, and optional scope groups."
+description: "A detailed breakdown of every delegated permission scope — openid, profile, email, User.Read, User.Read.All, GroupMember.Read.All, LicenseAssignment.Read.All, MailboxSettings.Read, Organization.Read.All, RoleManagement.Read.All, Sites.Read.All, Reports.Read.All, and AuditLog.Read.All — with guidance on admin consent, security review conversations, and optional scope groups."
 category: "Permissions"
 reading_time: "14 min read"
 keywords:
@@ -14,6 +14,7 @@ keywords:
   - groupmember.read.all
   - licenseassignment.read.all
   - mailboxsettings.read
+  - organization.read.all
   - delegated vs application permissions
   - microsoft entra permission review
 ---
@@ -110,6 +111,18 @@ M365 Tenant Reporter uses this scope primarily to classify mailboxes by purpose:
 
 This classification is operationally important because shared mailboxes and resource mailboxes frequently appear in user counts but represent a fundamentally different licensing and management posture. Being able to filter them out — or report on them separately — gives administrators a more accurate picture of true user-based consumption.
 
+## Organization.Read.All — tenant identity and verified domains
+
+The `Organization.Read.All` scope allows the application to read the current organization's richer directory profile. While `User.Read` is enough to access only the most basic organization properties such as `id`, `displayName`, and `verifiedDomains`, M365 Tenant Reporter now also uses organization metadata like tenant type, country code, creation date, preferred language, and technical notification contacts to enrich the dashboard header.
+
+This scope enables the application to:
+
+- Read `/organization` with a full property set rather than receiving `null` for non-basic fields.
+- Show the tenant information banner with the primary verified domain, tenant type, and country code.
+- Provide additional administrative context when reviewing reports across multiple tenants or subsidiaries.
+
+This is still a read-only delegated scope. It does not allow any changes to tenant branding, domains, licenses, or directory settings.
+
 ## RoleManagement.Read.All — admin role inventory
 
 The `RoleManagement.Read.All` scope allows the application to read directory role definitions and their assigned members. M365 Tenant Reporter uses this data in the security section to understand which accounts hold privileged Microsoft Entra roles and whether those privileged accounts have MFA registered.
@@ -186,4 +199,4 @@ Providing the full scope list in a table format — with each scope, its purpose
 
 ## Summary
 
-M365 Tenant Reporter requests only the delegated read permissions necessary to power its reporting modules. The permission model is modular, transparent, and designed for incremental consent. Core scopes cover user inventory, group memberships, license assignments, and mailbox classification. Optional scopes extend the reporting surface to include Microsoft 365 usage analytics and Entra sign-in activity. By understanding each scope and its purpose, administrators and security reviewers can make informed decisions about what data to expose and when.
+M365 Tenant Reporter requests only the delegated read permissions necessary to power its reporting modules. The permission model is modular, transparent, and designed for incremental consent. Core scopes cover tenant identity, user inventory, group memberships, license assignments, and mailbox classification. Optional scopes extend the reporting surface to include SharePoint and OneDrive inventory, Microsoft 365 usage analytics, and Entra sign-in activity. By understanding each scope and its purpose, administrators and security reviewers can make informed decisions about what data to expose and when.

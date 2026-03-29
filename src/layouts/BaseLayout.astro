@@ -3,7 +3,7 @@ import "@/styles/global.css";
 import SiteFooter from "@/components/site/SiteFooter.astro";
 import SiteHeader from "@/components/site/SiteHeader.astro";
 import { withBase } from "@/lib/paths";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, organizationProfiles } from "@/lib/site";
 
 interface Props {
   title: string;
@@ -30,7 +30,25 @@ const {
 } = Astro.props;
 
 const canonicalUrl = new URL(canonicalPath, Astro.site ?? Astro.url).toString();
+const ogImageUrl = new URL(withBase("/logo.svg"), Astro.site ?? Astro.url).toString();
 const structuredDataEntries = structuredData ? (Array.isArray(structuredData) ? structuredData : [structuredData]) : [];
+
+const defaultStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": siteConfig.name,
+  "url": new URL(withBase("/"), Astro.site ?? Astro.url).toString(),
+  "description": siteConfig.defaultDescription,
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web browser",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": {
+    "@type": "Person",
+    "name": siteConfig.authorName,
+    "url": siteConfig.authorUrl,
+    "sameAs": organizationProfiles
+  }
+};
 ---
 
 <!doctype html>
@@ -69,15 +87,21 @@ const structuredDataEntries = structuredData ? (Array.isArray(structuredData) ? 
     <meta property="og:site_name" content={siteConfig.name} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:alt" content={`${siteConfig.name} logo`} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content={siteConfig.socialHandle} />
     <meta name="twitter:creator" content={siteConfig.socialHandle} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
 
     {publishedTime && <meta property="article:published_time" content={publishedTime} />}
     {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    {structuredDataEntries.length === 0 && (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(defaultStructuredData)} />
+    )}
     {structuredDataEntries.map((entry) => (
       <script is:inline type="application/ld+json" set:html={JSON.stringify(entry)} />
     ))}

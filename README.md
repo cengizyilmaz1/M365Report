@@ -11,7 +11,7 @@ Production site:
 
 - Signs in with Microsoft Entra using authorization code flow with PKCE
 - Collects Microsoft Graph data directly in the browser
-- Builds overview, users, licenses, groups, mailbox purpose, SharePoint inventory, and security reports
+- Builds overview, users, licenses, groups, tenant profile, mailbox purpose, SharePoint inventory, OneDrive inventory, and security reports
 - Exports `XLSX`, `CSV`, `JSON`, and `HTML` files locally
 - Keeps tenant report data in memory only for the active browser session
 
@@ -92,11 +92,13 @@ Initial blog coverage includes:
 ## Microsoft Graph coverage
 
 - `/users`
+- `/organization`
 - `/subscribedSkus`
 - `/groups`
 - `/groups/{id}/members/$count`
 - `/groups/{id}/owners`
 - `/groups/{id}/drive`
+- `/users/{id}/drive`
 - `/users/{id}/mailboxSettings?$select=userPurpose`
 - `/users/{id}/manager`
 - `/reports/getOffice365ActiveUserDetail`
@@ -116,6 +118,7 @@ Core:
 - `GroupMember.Read.All`
 - `LicenseAssignment.Read.All`
 - `MailboxSettings.Read`
+- `Organization.Read.All`
 - `RoleManagement.Read.All`
 
 Optional SharePoint inventory:
@@ -130,7 +133,7 @@ Optional advanced audit:
 
 - `AuditLog.Read.All`
 
-`RoleManagement.Read.All` enables admin role inventory for the security section. `Sites.Read.All` enables the browser-safe SharePoint library inventory. `Reports.Read.All` still requires a supported Microsoft Entra role such as Reports Reader or a broader admin role. `AuditLog.Read.All` is used for last sign-in summaries and MFA registration reporting.
+`Organization.Read.All` enables the tenant profile banner to show organization metadata beyond the basic display name and verified domains. `RoleManagement.Read.All` enables admin role inventory for the security section. `Sites.Read.All` enables the browser-safe SharePoint inventory and per-user OneDrive metadata collection. `Reports.Read.All` still requires a supported Microsoft Entra role such as Reports Reader or a broader admin role. `AuditLog.Read.All` is used for last sign-in summaries and MFA registration reporting.
 
 ## Known Graph caveats
 
@@ -139,7 +142,7 @@ Optional advanced audit:
 - `mailboxSettings.userPurpose` can be unavailable for accounts without Exchange-backed mailbox data
 - Mailbox forwarding state is not exposed through `mailboxSettings`
 - Browser-safe mailbox quota data is not available because Microsoft Graph returns mailbox usage detail through redirected CSV downloads
-- Tenant-wide OneDrive drive enumeration is intentionally disabled in browser mode because delegated drive calls can auto-provision missing drives
+- Per-user delegated `GET /users/{id}/drive` calls can auto-provision a missing OneDrive for licensed users, so OneDrive inventory should be reviewed carefully before broad production use
 - Last sign-in summaries depend on both `AuditLog.Read.All` and tenant licensing that exposes sign-in activity
 
 ## Local development
