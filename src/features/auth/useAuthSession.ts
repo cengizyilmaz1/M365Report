@@ -28,7 +28,8 @@ interface AuthState {
 const defaultPermissionProfile: PermissionProfile = {
   core: { requested: true, granted: false },
   reports: { requested: true, granted: false },
-  advancedAudit: { requested: true, granted: false }
+  advancedAudit: { requested: true, granted: false },
+  sites: { requested: true, granted: false }
 };
 
 export function useAuthSession() {
@@ -116,7 +117,7 @@ export function useAuthSession() {
 
       await requestAdvancedAuditConsent(state.instance, state.config, state.account);
     },
-    acquireGraphToken: async (group: "core" | "reports" | "advancedAudit") => {
+    acquireGraphToken: async (group: "core" | "reports" | "advancedAudit" | "sites") => {
       if (!state.instance || !state.config || !state.account) {
         throw new Error("An authenticated account is required before acquiring a token.");
       }
@@ -146,6 +147,11 @@ async function buildPermissionProfile(
       requested: config.allowAuditOptIn && config.advancedAuditScopes.length > 0,
       granted: await probeScopeAccess(instance, config, account, "advancedAudit"),
       note: "Optional last sign-in summary scope."
+    },
+    sites: {
+      requested: config.sitesScopes.length > 0,
+      granted: await probeScopeAccess(instance, config, account, "sites"),
+      note: "Optional SharePoint inventory scope."
     }
   };
 }

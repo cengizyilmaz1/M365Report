@@ -17,15 +17,15 @@ export class GraphApiError extends Error {
 }
 
 export class GraphClient {
-  #getAccessToken: (group: "core" | "reports" | "advancedAudit") => Promise<string>;
+  #getAccessToken: (group: "core" | "reports" | "advancedAudit" | "sites") => Promise<string>;
 
-  constructor(getAccessToken: (group: "core" | "reports" | "advancedAudit") => Promise<string>) {
+  constructor(getAccessToken: (group: "core" | "reports" | "advancedAudit" | "sites") => Promise<string>) {
     this.#getAccessToken = getAccessToken;
   }
 
   async getJson<T>(
     path: string,
-    group: "core" | "reports" | "advancedAudit" = "core",
+    group: "core" | "reports" | "advancedAudit" | "sites" = "core",
     init?: RequestInit
   ): Promise<T> {
     const response = await this.request(path, group, {
@@ -41,7 +41,7 @@ export class GraphClient {
 
   async getText(
     path: string,
-    group: "core" | "reports" | "advancedAudit" = "reports",
+    group: "core" | "reports" | "advancedAudit" | "sites" = "reports",
     init?: RequestInit
   ) {
     const response = await this.request(path, group, {
@@ -57,7 +57,7 @@ export class GraphClient {
 
   async getAllPages<T>(
     path: string,
-    group: "core" | "reports" | "advancedAudit" = "core",
+    group: "core" | "reports" | "advancedAudit" | "sites" = "core",
     init?: RequestInit
   ) {
     const results: T[] = [];
@@ -78,7 +78,7 @@ export class GraphClient {
 
   private async request(
     path: string,
-    group: "core" | "reports" | "advancedAudit",
+    group: "core" | "reports" | "advancedAudit" | "sites",
     init?: RequestInit
   ) {
     const token = await this.#getAccessToken(group);

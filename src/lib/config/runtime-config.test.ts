@@ -15,6 +15,7 @@ describe("buildAuthConfig", () => {
       coreScopes: ["openid", "User.Read"],
       reportsScopes: ["Reports.Read.All"],
       advancedAuditScopes: ["AuditLog.Read.All"],
+      sitesScopes: ["Sites.Read.All"],
       allowAuditOptIn: true
     });
 

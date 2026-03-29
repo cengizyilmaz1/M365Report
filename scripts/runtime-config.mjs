@@ -14,6 +14,7 @@ export const runtimeConfigSchema = z.object({
   coreScopes: z.array(z.string().trim().min(1)).min(1),
   reportsScopes: z.array(z.string().trim().min(1)).default([]),
   advancedAuditScopes: z.array(z.string().trim().min(1)).default([]),
+  sitesScopes: z.array(z.string().trim().min(1)).default([]),
   allowAuditOptIn: z.boolean().default(true)
 });
 

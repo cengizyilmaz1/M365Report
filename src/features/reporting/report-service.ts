@@ -2,6 +2,7 @@ import { GraphApiError, GraphClient } from "@/lib/graph/client";
 import { parseCsv } from "@/lib/graph/csv";
 import { resolveSkuFriendlyName } from "@/lib/graph/sku-names";
 import type {
+  GraphDrive,
   GraphDirectoryRole,
   GraphDirectoryRoleMember,
   GraphGroup,
@@ -36,6 +37,10 @@ import { mapWithConcurrency } from "@/lib/utils/concurrency";
 const INACTIVE_THRESHOLD_DAYS = 30;
 export const BROWSER_ONLY_REPORTS_NOTE =
   "Microsoft Graph usage reports are delivered as short-lived redirected CSV downloads. In this browser-only deployment, those workload details cannot be read reliably. Use a server-side collector or private deployment for activity, SharePoint, and OneDrive usage reports.";
+export const BROWSER_ONLY_ONEDRIVE_NOTE =
+  "Tenant-wide OneDrive inventory is intentionally disabled in this browser-only deployment. Delegated Graph drive requests can automatically provision missing user drives, and the usage-report endpoints are redirected CSV downloads.";
+export const SITES_SCOPE_NOTE =
+  "Sites.Read.All has not been granted for this session. Add the Sites.Read.All delegated scope to load SharePoint site inventory.";
 
 const activityWorkloads: Array<{
   workload: ActivityWorkload;
@@ -71,7 +76,7 @@ interface SignInCollectionResult {
 }
 
 export async function collectTenantReportSnapshot(
-  acquireGraphToken: (group: "core" | "reports" | "advancedAudit") => Promise<string>,
+  acquireGraphToken: (group: "core" | "reports" | "advancedAudit" | "sites") => Promise<string>,
   permissionProfile: PermissionProfile
 ): Promise<TenantReportSnapshot> {
   const graph = new GraphClient(acquireGraphToken);
@@ -79,13 +84,13 @@ export async function collectTenantReportSnapshot(
 
   const [users, subscribedSkus, groups, signInCollection] = await Promise.all([
     graph.getAllPages<GraphUser>(
-      "/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,assignedLicenses&$top=999"
+      "/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,officeLocation,usageLocation,preferredLanguage,assignedLicenses&$top=999"
     ),
     graph.getJson<{ value: GraphSubscribedSku[] }>(
       "/subscribedSkus?$select=skuId,skuPartNumber,consumedUnits,capabilityStatus,prepaidUnits,servicePlans"
     ).then((r) => r.value),
     graph.getAllPages<GraphGroup>(
-      "/groups?$select=id,displayName,mailEnabled,securityEnabled,groupTypes&$top=999"
+      "/groups?$select=id,displayName,mail,mailEnabled,securityEnabled,groupTypes,visibility,createdDateTime&$top=999"
     ),
     collectLastSignInIndex(graph, permissionProfile)
   ]);
@@ -101,7 +106,7 @@ export async function collectTenantReportSnapshot(
       buildGroupRows(graph, groups, notes),
       buildMailboxRows(graph, users, notes),
       buildActivityDatasets(graph, permissionProfile),
-      collectSharePointData(graph, permissionProfile),
+      collectSharePointData(graph, permissionProfile, groups),
       collectOneDriveData(graph, permissionProfile),
       collectSecurityInsights(graph, users, skuNameById, signInCollection, permissionProfile),
       buildLicenseServiceRows(graph, users, subscribedSkus)
@@ -141,6 +146,11 @@ function buildUserRows(
         mail: user.mail ?? "Not available",
         accountEnabled: user.accountEnabled ?? false,
         userType: user.userType ?? "Unknown",
+        jobTitle: user.jobTitle ?? "Not set",
+        department: user.department ?? "Not set",
+        officeLocation: user.officeLocation ?? "Not set",
+        usageLocation: user.usageLocation ?? "Not set",
+        preferredLanguage: user.preferredLanguage ?? "Not set",
         assignedLicenseCount: assignedLicenseIds.length,
         assignedSkuNames: assignedLicenseIds.map((skuId) => skuNameById.get(skuId) ?? skuId),
         lastSuccessfulSignIn: signInIndex.get(user.id) ?? null
@@ -253,9 +263,12 @@ async function buildGroupRows(graph: GraphClient, groups: GraphGroup[], notes: s
       id: group.id,
       groupName: group.displayName ?? "Untitled group",
       groupType: normalizeGroupType(group),
+      mail: group.mail ?? "Not available",
+      visibility: group.visibility ?? "Not set",
       mailEnabled: Boolean(group.mailEnabled),
       securityEnabled: Boolean(group.securityEnabled),
-      memberCount
+      memberCount,
+      createdDateTime: group.createdDateTime ?? null
     } satisfies GroupReportRow;
   });
 
@@ -395,15 +408,84 @@ async function buildActivityDatasets(
 
 async function collectSharePointData(
   graph: GraphClient,
-  permissionProfile: PermissionProfile
+  permissionProfile: PermissionProfile,
+  groups: GraphGroup[]
 ): Promise<{ summary: SharePointSummary; sites: SharePointSiteRow[] }> {
   const empty: { summary: SharePointSummary; sites: SharePointSiteRow[] } = {
-    summary: { totalSites: 0, activeSites: 0, inactiveSites: 0, totalStorageUsedBytes: 0, status: "unavailable", note: "Reports.Read.All required." },
+    summary: { totalSites: 0, activeSites: 0, inactiveSites: 0, totalStorageUsedBytes: 0, status: "unavailable", note: SITES_SCOPE_NOTE },
     sites: []
   };
 
-  if (!permissionProfile.reports.granted) return empty;
-  if (isBrowserOnlyRuntime()) {
+  if (!permissionProfile.sites.granted) return empty;
+
+  const siteGroups = groups.filter((group) => group.groupTypes?.includes("Unified"));
+  if (siteGroups.length === 0) {
+    return {
+      summary: {
+        totalSites: 0,
+        activeSites: 0,
+        inactiveSites: 0,
+        totalStorageUsedBytes: 0,
+        status: "available",
+        note: "No Microsoft 365 group-connected SharePoint sites were detected for this tenant."
+      },
+      sites: []
+    };
+  }
+
+  try {
+    const now = Date.now();
+    const thresholdMs = INACTIVE_THRESHOLD_DAYS * 24 * 60 * 60 * 1000;
+    const siteRows = await mapWithConcurrency(siteGroups, 4, async (group) => {
+      try {
+        const drive = await graph.getJson<GraphDrive>(
+          `/groups/${group.id}/drive?$select=id,name,webUrl,driveType,lastModifiedDateTime,quota`,
+          "sites"
+        );
+
+        const lastModifiedDate = drive.lastModifiedDateTime ?? "";
+        const lastModifiedTime = lastModifiedDate ? new Date(lastModifiedDate).getTime() : 0;
+        const isActive = lastModifiedTime > 0 && (now - lastModifiedTime) < thresholdMs;
+
+        return {
+          siteId: drive.id,
+          siteUrl: drive.webUrl ?? "",
+          siteName: drive.name ?? group.displayName ?? "SharePoint site",
+          groupId: group.id,
+          groupName: group.displayName ?? "Untitled group",
+          lastModifiedDate,
+          storageUsedBytes: Math.max(drive.quota?.used ?? 0, 0),
+          storageAllocatedBytes: Math.max(drive.quota?.total ?? 0, 0),
+          storageRemainingBytes: Math.max(drive.quota?.remaining ?? 0, 0),
+          driveState: drive.quota?.state ?? "unknown",
+          isActive
+        } satisfies SharePointSiteRow;
+      } catch (error) {
+        if (error instanceof GraphApiError && [403, 404].includes(error.status)) {
+          return null;
+        }
+
+        throw error;
+      }
+    });
+
+    const sites = siteRows
+      .filter((row): row is SharePointSiteRow => Boolean(row))
+      .sort((left, right) => left.siteName.localeCompare(right.siteName));
+    const activeSites = sites.filter((site) => site.isActive).length;
+
+    return {
+      summary: {
+        totalSites: sites.length,
+        activeSites,
+        inactiveSites: sites.length - activeSites,
+        totalStorageUsedBytes: sites.reduce((sum, site) => sum + site.storageUsedBytes, 0),
+        status: "available",
+        note: "This browser-safe inventory focuses on Microsoft 365 group-connected SharePoint document libraries and their storage quotas."
+      },
+      sites
+    };
+  } catch (error) {
     return {
       summary: {
         totalSites: 0,
@@ -411,52 +493,9 @@ async function collectSharePointData(
         inactiveSites: 0,
         totalStorageUsedBytes: 0,
         status: "unavailable",
-        note: BROWSER_ONLY_REPORTS_NOTE
-      },
-      sites: []
-    };
-  }
-
-  try {
-    const csvText = await graph.getText("/reports/getSharePointSiteUsageDetail(period='D30')", "reports");
-    const rawRows = parseCsv(csvText);
-    const now = Date.now();
-    const thresholdMs = INACTIVE_THRESHOLD_DAYS * 24 * 60 * 60 * 1000;
-
-    const sites: SharePointSiteRow[] = rawRows.map((row) => {
-      const lastActivity = row["Last Activity Date"] || "";
-      const lastActivityTime = lastActivity ? new Date(lastActivity).getTime() : 0;
-      const isActive = lastActivityTime > 0 && (now - lastActivityTime) < thresholdMs;
-
-      return {
-        siteUrl: row["Site URL"] || row["Site Url"] || "",
-        siteName: row["Site URL"]?.split("/").pop() || row["Site Url"]?.split("/").pop() || "Unknown",
-        lastActivityDate: lastActivity,
-        fileCount: safeInt(row["File Count"]),
-        storageUsedBytes: safeInt(row["Storage Used (Byte)"]),
-        storageAllocatedBytes: safeInt(row["Storage Allocated (Byte)"]),
-        isActive
-      };
-    });
-
-    const activeSites = sites.filter((s) => s.isActive).length;
-
-    return {
-      summary: {
-        totalSites: sites.length,
-        activeSites,
-        inactiveSites: sites.length - activeSites,
-        totalStorageUsedBytes: sites.reduce((sum, s) => sum + s.storageUsedBytes, 0),
-        status: "available"
-      },
-      sites
-    };
-  } catch (error) {
-    return {
-      summary: {
-        totalSites: 0, activeSites: 0, inactiveSites: 0, totalStorageUsedBytes: 0,
-        status: "unavailable",
-        note: error instanceof GraphApiError ? "SharePoint usage report not accessible." : "Could not fetch SharePoint data."
+        note: error instanceof GraphApiError
+          ? "SharePoint site inventory could not be loaded with the current delegated role or scope set."
+          : "Could not fetch SharePoint site inventory."
       },
       sites: []
     };
@@ -464,73 +503,16 @@ async function collectSharePointData(
 }
 
 async function collectOneDriveData(
-  graph: GraphClient,
+  _graph: GraphClient,
   permissionProfile: PermissionProfile
 ): Promise<{ summary: OneDriveSummary; accounts: OneDriveAccountRow[] }> {
   const empty: { summary: OneDriveSummary; accounts: OneDriveAccountRow[] } = {
-    summary: { totalAccounts: 0, activeAccounts: 0, inactiveAccounts: 0, totalStorageUsedBytes: 0, status: "unavailable", note: "Reports.Read.All required." },
+    summary: { totalAccounts: 0, activeAccounts: 0, inactiveAccounts: 0, totalStorageUsedBytes: 0, status: "unavailable", note: BROWSER_ONLY_ONEDRIVE_NOTE },
     accounts: []
   };
 
-  if (!permissionProfile.reports.granted) return empty;
-  if (isBrowserOnlyRuntime()) {
-    return {
-      summary: {
-        totalAccounts: 0,
-        activeAccounts: 0,
-        inactiveAccounts: 0,
-        totalStorageUsedBytes: 0,
-        status: "unavailable",
-        note: BROWSER_ONLY_REPORTS_NOTE
-      },
-      accounts: []
-    };
-  }
-
-  try {
-    const csvText = await graph.getText("/reports/getOneDriveUsageAccountDetail(period='D30')", "reports");
-    const rawRows = parseCsv(csvText);
-    const now = Date.now();
-    const thresholdMs = INACTIVE_THRESHOLD_DAYS * 24 * 60 * 60 * 1000;
-
-    const accounts: OneDriveAccountRow[] = rawRows.map((row) => {
-      const lastActivity = row["Last Activity Date"] || "";
-      const lastActivityTime = lastActivity ? new Date(lastActivity).getTime() : 0;
-      const isActive = lastActivityTime > 0 && (now - lastActivityTime) < thresholdMs;
-
-      return {
-        ownerPrincipalName: row["Owner Principal Name"] || "",
-        ownerDisplayName: row["Owner Display Name"] || "",
-        lastActivityDate: lastActivity,
-        fileCount: safeInt(row["File Count"]),
-        storageUsedBytes: safeInt(row["Storage Used (Byte)"]),
-        storageAllocatedBytes: safeInt(row["Storage Allocated (Byte)"]),
-        isActive
-      };
-    });
-
-    const activeAccounts = accounts.filter((a) => a.isActive).length;
-
-    return {
-      summary: {
-        totalAccounts: accounts.length,
-        activeAccounts,
-        inactiveAccounts: accounts.length - activeAccounts,
-        totalStorageUsedBytes: accounts.reduce((sum, a) => sum + a.storageUsedBytes, 0),
-        status: "available"
-      },
-      accounts
-    };
-  } catch (error) {
-    return {
-      summary: {
-        totalAccounts: 0, activeAccounts: 0, inactiveAccounts: 0, totalStorageUsedBytes: 0,
-        status: "unavailable",
-        note: error instanceof GraphApiError ? "OneDrive usage report not accessible." : "Could not fetch OneDrive data."
-      },
-      accounts: []
-    };
-  }
+  if (!permissionProfile.reports.granted && !permissionProfile.sites.granted) return empty;
+  return empty;
 }
 
 async function collectSecurityInsights(
@@ -867,12 +849,6 @@ function buildActivityUnavailableNote(error: unknown) {
     return "Microsoft Graph did not return a usable workload export for this browser session.";
   }
   return "This browser-only deployment could not read the redirected workload CSV from Microsoft Graph.";
-}
-
-function safeInt(value: string | undefined): number {
-  if (!value) return 0;
-  const parsed = Number.parseInt(value, 10);
-  return Number.isNaN(parsed) ? 0 : parsed;
 }
 
 function isBrowserOnlyRuntime() {

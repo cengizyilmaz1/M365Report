@@ -74,7 +74,8 @@ function buildRows(snapshot: TenantReportSnapshot, dataset: DatasetKey) {
       return snapshot.sharePoint.sites.map((row) => ({
         ...row,
         storageUsedMB: Math.round(row.storageUsedBytes / 1048576),
-        storageAllocatedMB: Math.round(row.storageAllocatedBytes / 1048576)
+        storageAllocatedMB: Math.round(row.storageAllocatedBytes / 1048576),
+        storageRemainingMB: Math.round(row.storageRemainingBytes / 1048576)
       })) as Array<Record<string, unknown>>;
     case "onedrive":
       return snapshot.oneDrive.accounts.map((row) => ({

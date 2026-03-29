@@ -21,6 +21,7 @@ const config = normalizeConfig(
     ),
     reportsScopes: splitList(process.env.PUBLIC_REPORTS_SCOPES ?? "Reports.Read.All"),
     advancedAuditScopes: splitList(process.env.PUBLIC_ADVANCED_AUDIT_SCOPES ?? "AuditLog.Read.All"),
+    sitesScopes: splitList(process.env.PUBLIC_SITES_SCOPES ?? "Sites.Read.All"),
     allowAuditOptIn: normalizeBoolean(process.env.PUBLIC_ALLOW_AUDIT_OPT_IN, true)
   })
 );

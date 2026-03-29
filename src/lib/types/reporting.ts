@@ -8,6 +8,7 @@ export interface PermissionProfile {
   core: PermissionCapability;
   reports: PermissionCapability;
   advancedAudit: PermissionCapability;
+  sites: PermissionCapability;
 }
 
 export interface TenantOverview {
@@ -33,6 +34,11 @@ export interface UserReportRow {
   mail: string;
   accountEnabled: boolean;
   userType: string;
+  jobTitle: string;
+  department: string;
+  officeLocation: string;
+  usageLocation: string;
+  preferredLanguage: string;
   assignedLicenseCount: number;
   assignedSkuNames: string[];
   lastSuccessfulSignIn?: string | null;
@@ -69,9 +75,12 @@ export interface GroupReportRow {
   id: string;
   groupName: string;
   groupType: string;
+  mail: string;
+  visibility: string;
   mailEnabled: boolean;
   securityEnabled: boolean;
   memberCount: number;
+  createdDateTime?: string | null;
 }
 
 export interface MailboxReportRow {
@@ -115,12 +124,16 @@ export interface LastSignInSummary {
 }
 
 export interface SharePointSiteRow {
+  siteId: string;
   siteUrl: string;
   siteName: string;
-  lastActivityDate: string;
-  fileCount: number;
+  groupId: string;
+  groupName: string;
+  lastModifiedDate: string;
   storageUsedBytes: number;
   storageAllocatedBytes: number;
+  storageRemainingBytes: number;
+  driveState: string;
   isActive: boolean;
 }
 
@@ -188,6 +201,79 @@ export interface SecurityScoreDetail {
   score: number;
   maxScore: number;
   description: string;
+}
+
+export interface DetailAvailability {
+  status: "available" | "unavailable";
+  value: string;
+  note?: string;
+}
+
+export interface UserReportDetail {
+  id: string;
+  displayName: string;
+  userPrincipalName: string;
+  mail: string;
+  accountEnabled: boolean;
+  userType: string;
+  givenName: string;
+  surname: string;
+  jobTitle: string;
+  department: string;
+  companyName: string;
+  officeLocation: string;
+  city: string;
+  state: string;
+  country: string;
+  usageLocation: string;
+  preferredLanguage: string;
+  mobilePhone: string;
+  businessPhones: string[];
+  employeeId: string;
+  employeeType: string;
+  createdDateTime?: string | null;
+  onPremisesSyncEnabled?: boolean | null;
+  managerDisplayName: string;
+  managerUserPrincipalName: string;
+  assignedLicenseCount: number;
+  assignedSkuNames: string[];
+  mailboxPurpose: string;
+  mailboxTimeZone: string;
+  mailboxLanguage: string;
+  automaticRepliesStatus: string;
+  delegateMeetingMessageDelivery: string;
+  forwarding: DetailAvailability;
+  mailboxQuota: DetailAvailability;
+  notes: string[];
+}
+
+export interface DirectoryObjectRow {
+  id: string;
+  displayName: string;
+  userPrincipalName: string;
+  mail: string;
+  objectType: string;
+}
+
+export interface GroupReportDetail {
+  id: string;
+  displayName: string;
+  description: string;
+  mail: string;
+  mailNickname: string;
+  groupType: string;
+  visibility: string;
+  createdDateTime?: string | null;
+  membershipRule: string;
+  membershipRuleProcessingState: string;
+  isAssignableToRole: boolean;
+  mailEnabled: boolean;
+  securityEnabled: boolean;
+  ownerCount: number;
+  memberCount: number;
+  owners: DirectoryObjectRow[];
+  members: DirectoryObjectRow[];
+  notes: string[];
 }
 
 export interface SecurityInsights {

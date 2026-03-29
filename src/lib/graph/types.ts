@@ -20,6 +20,23 @@ export interface GraphUser {
   mail?: string | null;
   accountEnabled?: boolean | null;
   userType?: string | null;
+  givenName?: string | null;
+  surname?: string | null;
+  jobTitle?: string | null;
+  department?: string | null;
+  officeLocation?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  companyName?: string | null;
+  usageLocation?: string | null;
+  preferredLanguage?: string | null;
+  mobilePhone?: string | null;
+  businessPhones?: string[];
+  employeeId?: string | null;
+  employeeType?: string | null;
+  createdDateTime?: string | null;
+  onPremisesSyncEnabled?: boolean | null;
   assignedLicenses?: GraphAssignedLicense[];
   signInActivity?: GraphSignInActivity | null;
 }
@@ -50,10 +67,60 @@ export interface GraphSubscribedSku {
 export interface GraphGroup {
   id: string;
   displayName?: string | null;
+  description?: string | null;
+  mail?: string | null;
+  mailNickname?: string | null;
+  visibility?: string | null;
+  createdDateTime?: string | null;
+  membershipRule?: string | null;
+  membershipRuleProcessingState?: string | null;
+  isAssignableToRole?: boolean | null;
   mailEnabled?: boolean | null;
   securityEnabled?: boolean | null;
   groupTypes?: string[];
   members?: Array<{ id: string }>;
+}
+
+export interface GraphMailboxLanguage {
+  locale?: string | null;
+  displayName?: string | null;
+}
+
+export interface GraphAutomaticRepliesSetting {
+  status?: string | null;
+}
+
+export interface GraphMailboxSettings {
+  userPurpose?: string | null;
+  timeZone?: string | null;
+  language?: GraphMailboxLanguage | null;
+  delegateMeetingMessageDeliveryOptions?: string | null;
+  automaticRepliesSetting?: GraphAutomaticRepliesSetting | null;
+}
+
+export interface GraphDirectoryObject {
+  id: string;
+  "@odata.type"?: string;
+  displayName?: string | null;
+  userPrincipalName?: string | null;
+  mail?: string | null;
+}
+
+export interface GraphDriveQuota {
+  deleted?: number | null;
+  remaining?: number | null;
+  state?: string | null;
+  total?: number | null;
+  used?: number | null;
+}
+
+export interface GraphDrive {
+  id: string;
+  name?: string | null;
+  driveType?: string | null;
+  webUrl?: string | null;
+  lastModifiedDateTime?: string | null;
+  quota?: GraphDriveQuota | null;
 }
 
 export interface GraphDirectoryRole {

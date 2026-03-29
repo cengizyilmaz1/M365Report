@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { BROWSER_ONLY_REPORTS_NOTE, collectTenantReportSnapshot } from "./report-service";
+import {
+  BROWSER_ONLY_ONEDRIVE_NOTE,
+  BROWSER_ONLY_REPORTS_NOTE,
+  SITES_SCOPE_NOTE,
+  collectTenantReportSnapshot
+} from "./report-service";
 
 describe("collectTenantReportSnapshot", () => {
   afterEach(() => {
@@ -10,7 +15,7 @@ describe("collectTenantReportSnapshot", () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
 
-      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,assignedLicenses&$top=999")) {
+      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,officeLocation,usageLocation,preferredLanguage,assignedLicenses&$top=999")) {
         return jsonResponse({
           value: [
             {
@@ -57,12 +62,13 @@ describe("collectTenantReportSnapshot", () => {
         });
       }
 
-      if (url.includes("/groups?$select=id,displayName,mailEnabled,securityEnabled,groupTypes&$top=999")) {
+      if (url.includes("/groups?$select=id,displayName,mail,mailEnabled,securityEnabled,groupTypes,visibility,createdDateTime&$top=999")) {
         return jsonResponse({
           value: [
             {
               id: "g-1",
               displayName: "All Employees",
+              mail: "all.employees@contoso.com",
               mailEnabled: true,
               securityEnabled: false,
               groupTypes: ["Unified"]
@@ -110,7 +116,8 @@ describe("collectTenantReportSnapshot", () => {
       {
         core: { requested: true, granted: true },
         reports: { requested: true, granted: false },
-        advancedAudit: { requested: true, granted: false }
+        advancedAudit: { requested: true, granted: false },
+        sites: { requested: true, granted: false }
       }
     );
 
@@ -126,9 +133,9 @@ describe("collectTenantReportSnapshot", () => {
     expect(snapshot.activity.every((dataset) => dataset.status === "unavailable")).toBe(true);
     expect(snapshot.activity.every((dataset) => dataset.note?.includes("Reports.Read.All"))).toBe(true);
     expect(snapshot.sharePoint.summary.status).toBe("unavailable");
-    expect(snapshot.sharePoint.summary.note).toContain("Reports.Read.All");
+    expect(snapshot.sharePoint.summary.note).toBe(SITES_SCOPE_NOTE);
     expect(snapshot.oneDrive.summary.status).toBe("unavailable");
-    expect(snapshot.oneDrive.summary.note).toContain("Reports.Read.All");
+    expect(snapshot.oneDrive.summary.note).toBe(BROWSER_ONLY_ONEDRIVE_NOTE);
     expect(snapshot.security).toBeDefined();
     expect(snapshot.notes.some((note) => note.includes("service principal members"))).toBe(true);
     expect(snapshot.notes.some((note) => note.includes("mailboxSettings.userPurpose"))).toBe(true);
@@ -138,7 +145,7 @@ describe("collectTenantReportSnapshot", () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
 
-      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,assignedLicenses&$top=999")) {
+      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,officeLocation,usageLocation,preferredLanguage,assignedLicenses&$top=999")) {
         return jsonResponse({ value: [] });
       }
 
@@ -146,7 +153,7 @@ describe("collectTenantReportSnapshot", () => {
         return jsonResponse({ value: [] });
       }
 
-      if (url.includes("/groups?$select=id,displayName,mailEnabled,securityEnabled,groupTypes&$top=999")) {
+      if (url.includes("/groups?$select=id,displayName,mail,mailEnabled,securityEnabled,groupTypes,visibility,createdDateTime&$top=999")) {
         return jsonResponse({ value: [] });
       }
 
@@ -168,13 +175,87 @@ describe("collectTenantReportSnapshot", () => {
       {
         core: { requested: true, granted: true },
         reports: { requested: true, granted: true },
-        advancedAudit: { requested: true, granted: false }
+        advancedAudit: { requested: true, granted: false },
+        sites: { requested: true, granted: true }
       }
     );
 
     expect(snapshot.activity.every((dataset) => dataset.note === BROWSER_ONLY_REPORTS_NOTE)).toBe(true);
-    expect(snapshot.sharePoint.summary.note).toBe(BROWSER_ONLY_REPORTS_NOTE);
-    expect(snapshot.oneDrive.summary.note).toBe(BROWSER_ONLY_REPORTS_NOTE);
+    expect(snapshot.sharePoint.summary.status).toBe("available");
+    expect(snapshot.sharePoint.summary.note).toContain("No Microsoft 365 group-connected");
+    expect(snapshot.oneDrive.summary.note).toBe(BROWSER_ONLY_ONEDRIVE_NOTE);
+  });
+
+  it("builds a browser-safe SharePoint inventory from group document libraries when Sites.Read.All is granted", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+
+      if (url.includes("/users?$select=id,displayName,userPrincipalName,mail,accountEnabled,userType,jobTitle,department,officeLocation,usageLocation,preferredLanguage,assignedLicenses&$top=999")) {
+        return jsonResponse({ value: [] });
+      }
+
+      if (url.includes("/subscribedSkus")) {
+        return jsonResponse({ value: [] });
+      }
+
+      if (url.includes("/groups?$select=id,displayName,mail,mailEnabled,securityEnabled,groupTypes,visibility,createdDateTime&$top=999")) {
+        return jsonResponse({
+          value: [
+            {
+              id: "g-1",
+              displayName: "Project Atlas",
+              mail: "atlas@contoso.com",
+              mailEnabled: true,
+              securityEnabled: false,
+              groupTypes: ["Unified"]
+            }
+          ]
+        });
+      }
+
+      if (url.endsWith("/groups/g-1/members/$count")) {
+        return new Response("1", { status: 200 });
+      }
+
+      if (url.includes("/groups/g-1/drive?$select=id,name,webUrl,driveType,lastModifiedDateTime,quota")) {
+        return jsonResponse({
+          id: "drive-1",
+          name: "Project Atlas",
+          webUrl: "https://contoso.sharepoint.com/sites/atlas/Shared%20Documents",
+          lastModifiedDateTime: new Date().toISOString(),
+          quota: {
+            used: 1024,
+            total: 4096,
+            remaining: 3072,
+            state: "normal"
+          }
+        });
+      }
+
+      if (url.includes("/directoryRoles")) {
+        return jsonResponse({ value: [] });
+      }
+
+      throw new Error(`Unexpected request: ${url}`);
+    });
+
+    vi.stubGlobal("fetch", fetchMock);
+
+    const snapshot = await collectTenantReportSnapshot(
+      async () => "token",
+      {
+        core: { requested: true, granted: true },
+        reports: { requested: true, granted: false },
+        advancedAudit: { requested: true, granted: false },
+        sites: { requested: true, granted: true }
+      }
+    );
+
+    expect(snapshot.sharePoint.summary.status).toBe("available");
+    expect(snapshot.sharePoint.summary.totalSites).toBe(1);
+    expect(snapshot.sharePoint.sites[0]?.groupName).toBe("Project Atlas");
+    expect(snapshot.sharePoint.sites[0]?.storageUsedBytes).toBe(1024);
+    expect(snapshot.sharePoint.sites[0]?.driveState).toBe("normal");
   });
 });
 

@@ -6,7 +6,7 @@ import {
 import type { AccountInfo, AuthenticationResult, SilentRequest } from "@azure/msal-browser";
 import type { AuthConfig } from "@/lib/config/runtime-config";
 
-export type PermissionGroup = "core" | "reports" | "advancedAudit";
+export type PermissionGroup = "core" | "reports" | "advancedAudit" | "sites";
 
 export function isPlaceholderConfig(config: AuthConfig) {
   return /REPLACE_|CHANGE_ME|example\.com/i.test(`${config.clientId}${config.siteUrl}`);
@@ -54,12 +54,16 @@ export function getScopes(config: AuthConfig, group: PermissionGroup, includeIde
     return config.reportsScopes;
   }
 
+  if (group === "sites") {
+    return config.sitesScopes;
+  }
+
   return config.advancedAuditScopes;
 }
 
 export async function login(instance: PublicClientApplication, config: AuthConfig) {
   await instance.loginRedirect({
-    scopes: [...config.coreScopes, ...config.reportsScopes],
+    scopes: [...config.coreScopes, ...config.reportsScopes, ...config.sitesScopes],
     redirectStartPage: config.redirectUri
   });
 }

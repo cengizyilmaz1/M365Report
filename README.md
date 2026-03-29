@@ -11,7 +11,7 @@ Production site:
 
 - Signs in with Microsoft Entra using authorization code flow with PKCE
 - Collects Microsoft Graph data directly in the browser
-- Builds overview, users, licenses, groups, mailbox purpose, and activity reports
+- Builds overview, users, licenses, groups, mailbox purpose, SharePoint inventory, and security reports
 - Exports `XLSX`, `CSV`, `JSON`, and `HTML` files locally
 - Keeps tenant report data in memory only for the active browser session
 
@@ -95,7 +95,10 @@ Initial blog coverage includes:
 - `/subscribedSkus`
 - `/groups`
 - `/groups/{id}/members/$count`
+- `/groups/{id}/owners`
+- `/groups/{id}/drive`
 - `/users/{id}/mailboxSettings?$select=userPurpose`
+- `/users/{id}/manager`
 - `/reports/getOffice365ActiveUserDetail`
 - `/reports/getTeamsUserActivityUserDetail`
 - `/reports/getMailboxUsageDetail`
@@ -115,6 +118,10 @@ Core:
 - `MailboxSettings.Read`
 - `RoleManagement.Read.All`
 
+Optional SharePoint inventory:
+
+- `Sites.Read.All`
+
 Reports:
 
 - `Reports.Read.All`
@@ -123,13 +130,16 @@ Optional advanced audit:
 
 - `AuditLog.Read.All`
 
-`RoleManagement.Read.All` enables admin role inventory for the security section. `Reports.Read.All` still requires a supported Microsoft Entra role such as Reports Reader or a broader admin role. `AuditLog.Read.All` is used for last sign-in summaries and MFA registration reporting.
+`RoleManagement.Read.All` enables admin role inventory for the security section. `Sites.Read.All` enables the browser-safe SharePoint library inventory. `Reports.Read.All` still requires a supported Microsoft Entra role such as Reports Reader or a broader admin role. `AuditLog.Read.All` is used for last sign-in summaries and MFA registration reporting.
 
 ## Known Graph caveats
 
 - Group member counts are direct-only by design
 - Microsoft documents a v1.0 caveat for service principal members when listing group members
 - `mailboxSettings.userPurpose` can be unavailable for accounts without Exchange-backed mailbox data
+- Mailbox forwarding state is not exposed through `mailboxSettings`
+- Browser-safe mailbox quota data is not available because Microsoft Graph returns mailbox usage detail through redirected CSV downloads
+- Tenant-wide OneDrive drive enumeration is intentionally disabled in browser mode because delegated drive calls can auto-provision missing drives
 - Last sign-in summaries depend on both `AuditLog.Read.All` and tenant licensing that exposes sign-in activity
 
 ## Local development
@@ -183,6 +193,7 @@ Available public config values:
 - `PUBLIC_CORE_SCOPES`
 - `PUBLIC_REPORTS_SCOPES`
 - `PUBLIC_ADVANCED_AUDIT_SCOPES`
+- `PUBLIC_SITES_SCOPES`
 - `PUBLIC_ALLOW_AUDIT_OPT_IN`
 
 Example materialization:
@@ -220,6 +231,7 @@ Recommended repository variables:
 - `PUBLIC_CORE_SCOPES`
 - `PUBLIC_REPORTS_SCOPES`
 - `PUBLIC_ADVANCED_AUDIT_SCOPES`
+- `PUBLIC_SITES_SCOPES`
 - `PUBLIC_ALLOW_AUDIT_OPT_IN`
 
 ## Security posture

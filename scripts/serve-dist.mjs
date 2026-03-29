@@ -26,7 +26,9 @@ const contentTypes = new Map([
 
 async function resolveFile(requestPath) {
   const normalizedPath = decodeURIComponent(requestPath.split("?")[0]);
-  const candidatePath = path.join(distDir, normalizedPath);
+  const relativePath = normalizedPath.replace(/^\/+/, "");
+  const candidatePath = path.join(distDir, relativePath);
+  const notFoundPath = path.join(distDir, "404.html");
 
   try {
     const candidateStats = await stat(candidatePath);
@@ -36,24 +38,42 @@ async function resolveFile(requestPath) {
 
     return candidatePath;
   } catch {
-    const directoryIndex = path.join(distDir, normalizedPath, "index.html");
+    const directoryIndex = path.join(distDir, relativePath, "index.html");
     try {
       await access(directoryIndex);
       return directoryIndex;
     } catch {
-      return path.join(distDir, "404.html");
+      try {
+        await access(notFoundPath);
+        return notFoundPath;
+      } catch {
+        return null;
+      }
     }
   }
 }
 
 createServer(async (request, response) => {
   const filePath = await resolveFile(request.url ?? "/");
+  if (!filePath) {
+    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end("Not found");
+    return;
+  }
+
   const extension = path.extname(filePath);
   const contentType = contentTypes.get(extension) ?? "application/octet-stream";
   const statusCode = filePath.endsWith("404.html") ? 404 : 200;
 
   response.writeHead(statusCode, { "Content-Type": contentType });
-  createReadStream(filePath).pipe(response);
+  const stream = createReadStream(filePath);
+  stream.on("error", () => {
+    if (!response.headersSent) {
+      response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+    }
+    response.end("Not found");
+  });
+  stream.pipe(response);
 }).listen(port, host, () => {
   console.log(`Serving dist at http://${host}:${port}`);
 });

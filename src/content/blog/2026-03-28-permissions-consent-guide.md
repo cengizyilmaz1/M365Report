@@ -1,6 +1,6 @@
 ---
 title: "How Microsoft Graph permissions and admin consent work in M365 Tenant Reporter"
-description: "A detailed breakdown of every delegated permission scope — openid, profile, email, User.Read, User.Read.All, GroupMember.Read.All, LicenseAssignment.Read.All, MailboxSettings.Read, RoleManagement.Read.All, Reports.Read.All, and AuditLog.Read.All — with guidance on admin consent, security review conversations, and optional scope groups."
+description: "A detailed breakdown of every delegated permission scope — openid, profile, email, User.Read, User.Read.All, GroupMember.Read.All, LicenseAssignment.Read.All, MailboxSettings.Read, RoleManagement.Read.All, Sites.Read.All, Reports.Read.All, and AuditLog.Read.All — with guidance on admin consent, security review conversations, and optional scope groups."
 category: "Permissions"
 reading_time: "14 min read"
 keywords:
@@ -121,6 +121,18 @@ This scope enables the application to:
 - Build the admin security summary, including total privileged accounts and admins without MFA registration.
 
 Because this is still a read-only delegated permission, the app can inspect privileged role assignments but cannot change them.
+
+## Sites.Read.All — SharePoint library inventory
+
+The `Sites.Read.All` scope allows the application to read SharePoint site and document library metadata through delegated Microsoft Graph calls. In the current browser-only architecture, M365 Tenant Reporter uses this scope for a constrained, read-only inventory of Microsoft 365 group-connected SharePoint document libraries and their storage quotas.
+
+This scope enables the application to:
+
+- Read each Microsoft 365 group's default document library through `/groups/{id}/drive`.
+- Capture quota metadata such as used, remaining, and total storage.
+- Build the SharePoint section without persisting data or relying on server-side workers.
+
+This scope does **not** grant write access to files or sites. It also does not turn the app into a SharePoint administration portal. The implementation intentionally stays within read-only metadata collection and avoids operations that would modify site content or permissions.
 
 ## Reports.Read.All — Microsoft 365 usage reports
 
