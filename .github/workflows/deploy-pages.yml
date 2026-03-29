@@ -63,7 +63,7 @@ jobs:
           PUBLIC_AUTHORITY: ${{ vars.PUBLIC_AUTHORITY || 'https://login.microsoftonline.com/organizations' }}
           PUBLIC_CLIENT_ID: ${{ vars.PUBLIC_CLIENT_ID }}
           PUBLIC_KNOWN_AUTHORITIES: ${{ vars.PUBLIC_KNOWN_AUTHORITIES }}
-          PUBLIC_LOGIN_REDIRECT_PATH: ${{ vars.PUBLIC_LOGIN_REDIRECT_PATH || '/app' }}
+          PUBLIC_LOGIN_REDIRECT_PATH: ${{ vars.PUBLIC_LOGIN_REDIRECT_PATH || '/login' }}
           PUBLIC_POST_LOGOUT_REDIRECT_PATH: ${{ vars.PUBLIC_POST_LOGOUT_REDIRECT_PATH || '/' }}
           PUBLIC_CORE_SCOPES: ${{ vars.PUBLIC_CORE_SCOPES || 'openid,profile,email,User.Read,User.Read.All,GroupMember.Read.All,LicenseAssignment.Read.All,MailboxSettings.Read,RoleManagement.Read.All' }}
           PUBLIC_REPORTS_SCOPES: ${{ vars.PUBLIC_REPORTS_SCOPES || 'Reports.Read.All' }}
